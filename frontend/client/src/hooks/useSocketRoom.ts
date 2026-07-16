@@ -35,7 +35,7 @@ export function useSocketRoom({
 
   useEffect(() => {
     // Initialize Socket.io connection
-    const socket = io(window.location.origin, {
+    const socket = io(import.meta.env.VITE_API_URL || window.location.origin, {
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionDelay: 1000,

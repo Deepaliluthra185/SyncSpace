@@ -31,8 +31,11 @@ export function useYjsCodeEditor({
     yTextRef.current = yText;
 
     // Initialize WebSocket provider for Yjs
+    const defaultWsUrl = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`;
+    const wsUrl = import.meta.env.VITE_WS_URL || defaultWsUrl;
+
     const provider = new WebsocketProvider(
-      `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`,
+      wsUrl,
       `room-${roomId}`,
       ydoc,
       {
