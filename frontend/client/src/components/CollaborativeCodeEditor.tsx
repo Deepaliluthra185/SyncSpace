@@ -6,7 +6,7 @@ import { useYjsCodeEditor } from "@/hooks/useYjsCodeEditor";
 
 interface CollaborativeCodeEditorProps {
   roomId: string;
-  userId: number;
+  userId: string;
   userName: string;
   onBroadcast?: (data: any) => void;
 }

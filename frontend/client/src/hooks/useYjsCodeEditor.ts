@@ -4,7 +4,7 @@ import { WebsocketProvider } from "y-websocket";
 
 interface UseYjsCodeEditorOptions {
   roomId: string;
-  userId: number;
+  userId: string;
   userName: string;
   onCodeChange?: (code: string) => void;
 }

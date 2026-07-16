@@ -1,9 +1,10 @@
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "../contexts/AuthContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -46,13 +47,13 @@ export default function DashboardLayout({
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
-  const { loading, user } = useAuth();
+  const { isLoading, user } = useAuth();
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
 
-  if (loading) {
+  if (isLoading) {
     return <DashboardLayoutSkeleton />
   }
 
@@ -205,7 +206,7 @@ function DashboardLayoutContent({
                 <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <Avatar className="h-9 w-9 border shrink-0">
                     <AvatarFallback className="text-xs font-medium">
-                      {user?.name?.charAt(0).toUpperCase()}
+                      {user?.username?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <DropdownMenuLabel>

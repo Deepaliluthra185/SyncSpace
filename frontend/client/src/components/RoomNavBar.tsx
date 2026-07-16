@@ -7,7 +7,7 @@ import { Share2, Users, Wifi, WifiOff, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 
 interface User {
-  userId: number;
+  userId: string;
   userName: string;
   userEmail: string;
   joinedAt: Date;
@@ -18,7 +18,7 @@ interface RoomNavBarProps {
   roomId: string;
   connected: boolean;
   activeUsers: User[];
-  currentUserId: number;
+  currentUserId: string;
 }
 
 export function RoomNavBar({

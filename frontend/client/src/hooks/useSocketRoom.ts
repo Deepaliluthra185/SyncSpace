@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 
 export interface UserPresence {
-  userId: number;
+  userId: string;
   userName: string;
   userEmail: string;
   joinedAt: Date;
@@ -10,12 +10,12 @@ export interface UserPresence {
 
 interface UseSocketRoomOptions {
   roomId: string;
-  userId: number;
+  userId: string;
   userName: string;
   userEmail: string;
   onUsersUpdated?: (users: UserPresence[]) => void;
   onCodeChange?: (update: any) => void;
-  onCursorMove?: (data: { userId: number; line: number; column: number }) => void;
+  onCursorMove?: (data: { userId: string; line: number; column: number }) => void;
   onError?: (error: any) => void;
 }
 
@@ -73,7 +73,7 @@ export function useSocketRoom({
       onCodeChange?.(data.update);
     });
 
-    socket.on("cursor-move", (data: { userId: number; line: number; column: number }) => {
+    socket.on("cursor-move", (data: { userId: string; line: number; column: number }) => {
       onCursorMove?.(data);
     });
 

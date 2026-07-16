@@ -48,8 +48,8 @@ export default function Room() {
   // Initialize Socket.io connection
   const { connected, broadcastCodeChange, broadcastUserActive } = useSocketRoom({
     roomId,
-    userId: user?.id || 0,
-    userName: user?.name || "Anonymous",
+    userId: user?.id || "",
+    userName: user?.username || "Anonymous",
     userEmail: user?.email || "unknown@example.com",
     onUsersUpdated: (users) => {
       setActiveUsers(users);
@@ -135,7 +135,7 @@ export default function Room() {
               <CollaborativeCodeEditor
                 roomId={roomId}
                 userId={user.id}
-                userName={user.name || "Anonymous"}
+                userName={user.username || "Anonymous"}
                 onBroadcast={(data) => {
                   if (data.type === "code") {
                     broadcastCodeChange(data);
