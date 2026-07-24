@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SyncSpace Dashboard | Enterprise Collaboration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-mid": "#1E293B",
+                    "code-bg": "#1E1E1E",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-secondary-fixed-variant": "#005236",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-primary-fixed": "#001a42",
+                    "secondary-fixed": "#6ffbbe",
+                    "surface": "#0b1326",
+                    "error": "#ffb4ab",
+                    "surface-container-high": "#222a3d",
+                    "secondary-container": "#00a572",
+                    "primary-fixed-dim": "#adc6ff",
+                    "surface-low": "#0F172A",
+                    "background": "#0b1326",
+                    "inverse-primary": "#005ac2",
+                    "surface-variant": "#2d3449",
+                    "syntax-purple": "#C586C0",
+                    "syntax-blue": "#9CDCFE",
+                    "primary-fixed": "#d8e2ff",
+                    "secondary": "#4edea3",
+                    "tertiary": "#ffb95f",
+                    "surface-container-low": "#131b2e",
+                    "on-secondary": "#003824",
+                    "on-primary-fixed-variant": "#004395",
+                    "tertiary-container": "#ca8100",
+                    "on-primary": "#002e6a",
+                    "on-error": "#690005",
+                    "on-tertiary": "#472a00",
+                    "border-subtle": "rgba(255, 255, 255, 0.1)",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "surface-bright": "#31394d",
+                    "on-error-container": "#ffdad6",
+                    "surface-lowest": "#020617",
+                    "surface-container": "#171f33",
+                    "on-secondary-fixed": "#002113",
+                    "surface-container-highest": "#2d3449",
+                    "on-surface-variant": "#c2c6d6",
+                    "surface-container-lowest": "#060e20",
+                    "on-secondary-container": "#00311f",
+                    "tertiary-fixed": "#ffddb8",
+                    "outline-variant": "#424754",
+                    "on-primary-container": "#00285d",
+                    "primary": "#adc6ff",
+                    "surface-dim": "#0b1326",
+                    "primary-container": "#4d8eff",
+                    "on-background": "#dae2fd",
+                    "error-container": "#93000a",
+                    "on-tertiary-container": "#3e2400",
+                    "inverse-on-surface": "#283044",
+                    "inverse-surface": "#dae2fd",
+                    "outline": "#8c909f",
+                    "syntax-yellow": "#DCDCAA",
+                    "secondary-fixed-dim": "#4edea3",
+                    "surface-tint": "#adc6ff",
+                    "on-surface": "#dae2fd"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "space-sm": "8px",
+                    "gutter": "12px",
+                    "space-xs": "4px",
+                    "space-lg": "16px",
+                    "space-md": "12px",
+                    "space-xl": "24px",
+                    "container-padding": "1rem"
+            },
+            "fontFamily": {
+                    "body-sm": ["Geist"],
+                    "code-sm": ["JetBrains Mono"],
+                    "label-sm": ["JetBrains Mono"],
+                    "caption": ["Geist"],
+                    "body-md": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "label-md": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "code-sm": ["11px", {"lineHeight": "1.7", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "caption": ["10px", {"lineHeight": "12px", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #020617;
+            color: #dae2fd;
+            font-family: 'Geist', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .border-subtle { border-color: rgba(255, 255, 255, 0.1); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2d3449; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #adc6ff; }
+        
+        @keyframes pulse-gentle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
+        }
+        .animate-pulse-gentle { animation: pulse-gentle 2s infinite ease-in-out; }
+    </style>
+</head>
+<body class="dark bg-surface-lowest">
+<!-- SideNavBar Anchor -->
+<aside class="fixed left-0 top-0 h-screen w-[240px] bg-surface-low border-r border-subtle flex flex-col py-space-lg z-50" id="sidebar">
+<div class="px-space-lg mb-8">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">SyncSpace</h1>
+<p class="font-label-sm text-on-surface-variant">Enterprise Plan</p>
+</div>
+<button class="mx-space-lg mb-8 bg-primary text-on-primary font-label-md py-space-sm px-space-md rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">add</span>
+            New Session
+        </button>
+<nav class="flex-1 space-y-1">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center px-space-lg py-2 text-primary border-l-2 border-primary bg-primary/10 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center px-space-lg py-2 text-on-surface-variant hover:bg-surface-mid transition-colors font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">tactic</span>
+                Workspace
+            </a>
+<a class="flex items-center px-space-lg py-2 text-on-surface-variant hover:bg-surface-mid transition-colors font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">history</span>
+                History
+            </a>
+<a class="flex items-center px-space-lg py-2 text-on-surface-variant hover:bg-surface-mid transition-colors font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">group</span>
+                Team
+            </a>
+</nav>
+<div class="mt-auto border-t border-subtle pt-space-lg px-space-sm space-y-1">
+<a class="flex items-center px-space-lg py-2 text-on-surface-variant hover:bg-surface-mid transition-colors font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+                Settings
+            </a>
+<a class="flex items-center px-space-lg py-2 text-on-surface-variant hover:bg-surface-mid transition-colors font-body-md" href="#">
+<span class="material-symbols-outlined mr-3">help</span>
+                Support
+            </a>
+<div class="flex items-center gap-3 px-space-lg py-space-md">
+<img class="w-8 h-8 rounded-full border-2 border-primary" data-alt="A professional close-up headshot of a software engineer with a subtle neon glow reflecting off their glasses, set against a dark, tech-focused background. The lighting is cold and clinical, using electric blue highlights to emphasize a modern developer persona. High quality, 8k resolution, minimalist style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGIJcvDHDRB4q0Fn5DXSnjWsdp1o8mlbanXAiM7hSSitnIikaOKsEr5TtsIYKE1YkeoM2LH5E7xb5Q_2rO6FiizNh7P6eh4lIhFTXJWScW2Jbr315_YJmdHDVzCTYKgwlwXC4UQOGOiN7XHy7YSgqFKqIuYMXlM0YoZLi4E87_S3w9DX_o7gdFgCvjK9tF54q3wAKqjfm3RPmO8CDlrpuxfTpH3GLs2sLqsVcAYSDyCobkeZJMVXJHu1BG5yYoOFkSQNS1pnTEcLbS"/>
+<div class="overflow-hidden">
+<p class="font-label-md text-on-surface truncate">Alex Chen</p>
+<p class="font-caption text-on-surface-variant truncate">Lead Developer</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas Area -->
+<main class="ml-[240px] flex flex-col min-h-screen">
+<!-- TopNavBar Anchor -->
+<header class="h-12 px-space-lg flex justify-between items-center bg-surface-low border-b border-subtle sticky top-0 z-40">
+<div class="flex items-center gap-space-xl">
+<nav class="flex gap-space-lg">
+<a class="font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Projects</a>
+<a class="font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Shared</a>
+<a class="font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Templates</a>
+</nav>
+</div>
+<div class="flex-1 max-w-md mx-8">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full bg-surface-lowest border border-subtle rounded px-10 py-1.5 font-body-sm focus:outline-none focus:border-primary transition-colors" placeholder="Search sessions, users, or tags..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-space-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">account_tree</button>
+<div class="h-4 w-[1px] bg-subtle mx-1"></div>
+<button class="font-label-md px-3 py-1 bg-surface-mid border border-subtle rounded hover:bg-surface-variant transition-colors">Invite</button>
+<button class="font-label-md px-3 py-1 bg-secondary text-on-secondary rounded hover:opacity-90 transition-opacity">Go Live</button>
+</div>
+</header>
+<!-- Dashboard Content -->
+<section class="p-space-xl flex-1 max-w-[1400px] mx-auto w-full">
+<div class="flex justify-between items-end mb-space-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">Session Dashboard</h2>
+<p class="font-body-md text-on-surface-variant">Manage your collaborative technical workspaces.</p>
+</div>
+<div class="flex gap-space-sm">
+<div class="flex items-center bg-surface-low border border-subtle rounded-lg px-2">
+<button class="p-2 text-primary"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="p-2 text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">view_list</span></button>
+</div>
+</div>
+</div>
+<!-- Bento Grid of Sessions -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Active Session Card -->
+<div class="group bg-surface-low border border-subtle rounded-lg p-space-lg hover:border-primary transition-all duration-300 relative overflow-hidden flex flex-col min-h-[220px]">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex justify-between items-start mb-space-md">
+<span class="font-label-sm text-primary bg-primary/10 px-2 py-0.5 rounded flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse-gentle"></span>
+                            Live Now
+                        </span>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">more_vert</button>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">interview-142</h3>
+<p class="font-body-sm text-on-surface-variant mt-1 mb-auto">Technical Assessment: Senior Frontend Engineer (Architecture &amp; Performance Focus)</p>
+<div class="mt-space-lg flex items-center justify-between pt-space-md border-t border-subtle">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border-2 border-surface-low" data-alt="Avatar portrait of a software engineer with glasses, looking professional, soft studio lighting, tech background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb8Z9Cs0vgwjt1IL2S-Th2ZbIvTUIoEDp88ZzuG5wf9nB-ZPVWQgGeGK8O0qCOylm85m7R3CKoyPX2LYfhkQtob7PgfoQRkXlO_HJGDzJ7QMmc2fc2E9restoB1KVPhUr-cC3eQSz_Z1Nv_a4wrqT-XclvXZYtKi9vO78U5HFroooj_7sjoeqXfXQS-oiChEcxmXOk5yLfKwnXgnVmh9fL2w4iH1uhxIymIZzFZ0J206XKuGSrhW2hSh1che3BHjUk8kq7occmX6yK"/>
+<img class="w-6 h-6 rounded-full border-2 border-surface-low" data-alt="Avatar portrait of a developer in a dark hoodie, focused expression, cinematic lighting, purple accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWyVC440Cognlwds3SN9q6AT7Aa_PlY9GrCiQOY1EZUTz-DnchQEbD65bIFt5bJefMBdGsyn2eqlJDyHecK6GM00lKq6tMDhfizZBxXmvhz6vQgCkScHY14-7qD_-VBOcSvPZaPSrgAiUj7GPzOHRYtGtvPO_wWpjY9x_YaQYtC50jKKvIMlee5IXhms92mo3OmLlXuatGMXKUrJ-5yYOCAGzVyvSn-oZwkseYH_5tKrrKxqOaDJxTnJg8i72dBduk6oS9ByCZBLCF"/>
+<div class="w-6 h-6 rounded-full bg-surface-mid border-2 border-surface-low flex items-center justify-center font-caption text-primary">+2</div>
+</div>
+<span class="font-code-sm text-on-surface-variant">Modified 12m ago</span>
+</div>
+</div>
+<!-- Session Card 2 -->
+<div class="group bg-surface-low border border-subtle rounded-lg p-space-lg hover:border-primary transition-all duration-300 flex flex-col min-h-[220px]">
+<div class="flex justify-between items-start mb-space-md">
+<span class="font-label-sm text-on-surface-variant bg-surface-mid px-2 py-0.5 rounded">Paused</span>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">more_vert</button>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">architecture-sync</h3>
+<p class="font-body-sm text-on-surface-variant mt-1 mb-auto">Microservices migration planning and whiteboard session for Q3 infrastructure overhaul.</p>
+<div class="mt-space-lg flex items-center justify-between pt-space-md border-t border-subtle">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border-2 border-surface-low" data-alt="Professional woman developer avatar, neutral expression, soft office lighting, high quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1XAKRCeB0HS3QNMqbagpsl9EjVzMsAcFLFvqJ9H9dZ33oKjgh7v8H8ol7ntOVZirF920lPkJTg-8yq2H5o0TW28UCNBjce3dyoqSRO6EEqrxg-Xmk3E9rn1wgVAQXVi7iiM4WeCOTx1DRrL7EAXbeFn-obGlEwUmWJsUA6RSoEfQuaIrszhXdBVjTd_BEOGhPz-LOgR3ISuEocCCJn4sxHUM4GOUaZJyLrF5Woad41u9TLTtiUasTDmaiwhY4M1IZmNX46UFYigEU"/>
+<img class="w-6 h-6 rounded-full border-2 border-surface-low" data-alt="Man engineer avatar, professional portrait, soft lighting, dark technology themed background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVhcC-9oupsCHuzNCUGEwWInaDc9d_SwxuYKlsK-sUZ3H6Ixd_G_knqkrD0lsTxbWKZGvRzvTnwPMbMse6i-LUYdAsKi9Z6fcKcmdSABiOxAir2WuRKbBFWOaWRLtk_EEqL1g8ZoLkDmvzEH9f5H4JirMXnkxHZlwsMyGMU8WWYoZjaFMVu34eFB-2KKuDICe720FJtnsHFXpj9kIi_9JyikftDBfBp6Ov8haFgyg6GVXYdUxb8m72d15I0I5B97Qh-Cy6REJAFdTw"/>
+</div>
+<span class="font-code-sm text-on-surface-variant">May 14, 2024</span>
+</div>
+</div>
+<!-- Session Card 3 -->
+<div class="group bg-surface-low border border-subtle rounded-lg p-space-lg hover:border-primary transition-all duration-300 flex flex-col min-h-[220px]">
+<div class="flex justify-between items-start mb-space-md">
+<span class="font-label-sm text-on-surface-variant bg-surface-mid px-2 py-0.5 rounded">Completed</span>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">more_vert</button>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">frontend-pairing</h3>
+<p class="font-body-sm text-on-surface-variant mt-1 mb-auto">Pair programming for the design system component library implementation and testing.</p>
+<div class="mt-space-lg flex items-center justify-between pt-space-md border-t border-subtle">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border-2 border-surface-low" data-alt="Software developer avatar, creative and professional, warm light, dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8Emm-VAhuux68hfSrXnhyGER5XePDOsc7N4n5H3ROXjTjzpD_wzQv7Ki9fkmTI6JbiXOR79eCPnyGZljwu-bPGpyDBO7xzSKQJvPJe1y6k5pBWdI0tStfc9aq63DIZ1e87uN5-YoXeXNeebB7kPROAzCJ8xk7F-kveJAlxxG8J20PcDxxVXa6UbfqRIT6-aSxzO-b490X1xW0hKRz1aeZPSbtI6DmhO7N-081srtlkP4E-wOh5CPfOD34x63-0fdVUif2x0wwVRq7"/>
+</div>
+<span class="font-code-sm text-on-surface-variant">May 12, 2024</span>
+</div>
+</div>
+<!-- Activity Feed / Stats Card (Bento expansion) -->
+<div class="md:col-span-2 lg:col-span-1 bg-surface-container-low border border-subtle rounded-lg p-space-lg">
+<h4 class="font-label-md text-on-surface mb-space-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">analytics</span>
+                        Recent Activity
+                    </h4>
+<ul class="space-y-space-md">
+<li class="flex gap-3 items-start">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5"></div>
+<div>
+<p class="font-body-sm text-on-surface">Sarah modified <span class="text-primary">architecture-sync</span></p>
+<p class="font-caption text-on-surface-variant">2 hours ago</p>
+</div>
+</li>
+<li class="flex gap-3 items-start opacity-70">
+<div class="w-1.5 h-1.5 rounded-full bg-on-surface-variant mt-1.5"></div>
+<div>
+<p class="font-body-sm text-on-surface">Export generated for <span class="text-primary">interview-140</span></p>
+<p class="font-caption text-on-surface-variant">Yesterday</p>
+</div>
+</li>
+<li class="flex gap-3 items-start opacity-70">
+<div class="w-1.5 h-1.5 rounded-full bg-on-surface-variant mt-1.5"></div>
+<div>
+<p class="font-body-sm text-on-surface">New member invited to <span class="text-primary">SyncSpace Admin</span></p>
+<p class="font-caption text-on-surface-variant">2 days ago</p>
+</div>
+</li>
+</ul>
+<button class="w-full mt-space-lg py-2 border border-subtle rounded font-label-sm text-on-surface-variant hover:bg-surface-mid hover:text-on-surface transition-all">View Full History</button>
+</div>
+<!-- Collaborative Overview Card -->
+<div class="lg:col-span-2 bg-gradient-to-br from-surface-low to-surface-container border border-subtle rounded-lg p-space-lg flex items-center gap-space-xl overflow-hidden relative">
+<!-- Subtle ambient shader background -->
+
+<div class="relative z-10 flex-1">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Team Collaboration Pulse</h3>
+<p class="font-body-sm text-on-surface-variant mb-space-lg max-w-md">Your team has completed 14 sessions this week with 98% engagement. The next sprint planning is scheduled for tomorrow at 10 AM.</p>
+<div class="flex gap-space-xl">
+<div>
+<p class="font-headline-md text-secondary">24h</p>
+<p class="font-caption text-on-surface-variant uppercase tracking-wider">Avg Session</p>
+</div>
+<div class="border-l border-subtle pl-space-xl">
+<p class="font-headline-md text-primary">8</p>
+<p class="font-caption text-on-surface-variant uppercase tracking-wider">Active Rooms</p>
+</div>
+<div class="border-l border-subtle pl-space-xl">
+<p class="font-headline-md text-tertiary">92%</p>
+<p class="font-caption text-on-surface-variant uppercase tracking-wider">Storage Used</p>
+</div>
+</div>
+</div>
+<div class="hidden md:block relative z-10 w-48 h-32 bg-surface-lowest border border-subtle rounded-lg overflow-hidden shadow-2xl">
+<div class="p-2 border-b border-subtle flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-error"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-tertiary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+</div>
+<div class="p-2 space-y-2">
+<div class="h-1 bg-primary/20 rounded w-full"></div>
+<div class="h-1 bg-primary/10 rounded w-3/4"></div>
+<div class="h-1 bg-primary/20 rounded w-5/6"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Floating Action Button (Contextual) -->
+<button class="fixed bottom-space-xl right-space-xl w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50 group">
+<span class="material-symbols-outlined text-[28px] group-hover:rotate-90 transition-transform">add</span>
+</button>
+</main>
+<script>
+        // Micro-interactions and atmospheric logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.bg-surface-low');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    // Visual feedback handled by Tailwind group-hover
+                });
+            });
+
+            // Smooth search focus
+            const searchInput = document.querySelector('input[type="text"]');
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.classList.add('scale-[1.02]');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.classList.remove('scale-[1.02]');
+            });
+        });
+    </script>
+</body></html>

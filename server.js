@@ -36,12 +36,30 @@ const io = new Server(server, {
   cors: { origin: '*', methods: ['GET', 'POST'] }
 });
 
+const roomUsers = new Map(); // roomId -> Map(userId -> UserData)
+
 io.on('connection', (socket) => {
   console.log(`Socket connected: ${socket.id}`);
   
   socket.on('join-room', (data) => {
     socket.join(data.roomId);
     socket.to(data.roomId).emit('user-joined', data);
+
+    if (!roomUsers.has(data.roomId)) {
+      roomUsers.set(data.roomId, new Map());
+    }
+    
+    const usersInRoom = roomUsers.get(data.roomId);
+    usersInRoom.set(data.userId, {
+      userId: data.userId,
+      userName: data.userName,
+      userEmail: data.userEmail,
+      joinedAt: new Date(),
+      socketId: socket.id
+    });
+
+    const activeUsers = Array.from(usersInRoom.values());
+    io.to(data.roomId).emit('users-updated', { users: activeUsers });
   });
 
   socket.on('user-active', (data) => {
@@ -51,9 +69,41 @@ io.on('connection', (socket) => {
   socket.on('leave-room', (data) => {
     socket.leave(data.roomId);
     socket.to(data.roomId).emit('user-left', data);
+
+    const usersInRoom = roomUsers.get(data.roomId);
+    if (usersInRoom) {
+      usersInRoom.delete(data.userId);
+      const activeUsers = Array.from(usersInRoom.values());
+      io.to(data.roomId).emit('users-updated', { users: activeUsers });
+    }
+  });
+
+  socket.on('code-change', (data) => {
+    socket.to(data.roomId).emit('code-change', data);
+  });
+
+  socket.on('cursor-move', (data) => {
+    socket.to(data.roomId).emit('cursor-move', data);
+  });
+
+  socket.on('whiteboard-update', (data) => {
+    socket.to(data.roomId).emit('whiteboard-update', data);
   });
   
   socket.on('disconnect', () => {
+    roomUsers.forEach((usersInRoom, roomId) => {
+      let changed = false;
+      for (const [userId, userData] of usersInRoom.entries()) {
+        if (userData.socketId === socket.id) {
+          usersInRoom.delete(userId);
+          changed = true;
+        }
+      }
+      if (changed) {
+        const activeUsers = Array.from(usersInRoom.values());
+        io.to(roomId).emit('users-updated', { users: activeUsers });
+      }
+    });
     console.log(`Socket disconnected: ${socket.id}`);
   });
 });

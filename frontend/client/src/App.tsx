@@ -9,11 +9,18 @@ import Home from "./pages/Home";
 import Room from "./pages/Room";
 import AuthPage from "./pages/AuthPage";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ component: Component }: { component: any }) => {
   const { token, isLoading } = useAuth();
   const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (!isLoading && !token) {
+      setLocation("/auth");
+    }
+  }, [isLoading, token, setLocation]);
 
   if (isLoading) {
     return (
@@ -24,7 +31,6 @@ const ProtectedRoute = ({ component: Component }: { component: any }) => {
   }
 
   if (!token) {
-    setLocation("/auth");
     return null;
   }
 
