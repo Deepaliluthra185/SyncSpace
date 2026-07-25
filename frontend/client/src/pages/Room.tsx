@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { RoomNavBar } from "@/components/RoomNavBar";
-import { SplitPanelLayout } from "@/components/SplitPanelLayout";
-import { ArchitectureWhiteboard } from "@/components/ArchitectureWhiteboard";
-import { CollaborativeCodeEditor } from "@/components/CollaborativeCodeEditor";
+import { SyncSpaceWhiteboard } from "@/components/SyncSpaceWhiteboard";
 import { useSocketRoom, type UserPresence } from "@/hooks/useSocketRoom";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -144,75 +142,7 @@ export default function Room() {
 
         {/* Main Workspace Canvas */}
         <main className="flex-1 flex flex-col relative overflow-hidden bg-surface-lowest">
-          <div className="flex flex-1 overflow-hidden">
-            <SplitPanelLayout
-              leftPanel={{
-                content: (
-                  <ArchitectureWhiteboard
-                    roomId={roomId}
-                    onBroadcast={(data) => {
-                      // Broadcast whiteboard updates via Socket.io
-                      console.log("Whiteboard update:", data);
-                    }}
-                  />
-                ),
-              }}
-              rightPanel={{
-                content: (
-                  <CollaborativeCodeEditor
-                    roomId={roomId}
-                    userId={user.id}
-                    userName={user.username || "Anonymous"}
-                    onBroadcast={(data) => {
-                      if (data.type === "code") {
-                        broadcastCodeChange(data);
-                      }
-                    }}
-                  />
-                ),
-              }}
-            />
-          </div>
-
-          {/* Bottom Replay Toolbar */}
-          <footer className="h-14 bg-surface-low border-t border-subtle flex items-center px-space-lg gap-space-xl">
-            <div className="flex items-center gap-space-sm">
-              <button className="p-2 text-primary hover:bg-surface-mid transition-colors rounded-full">
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>play_circle</span>
-              </button>
-              <button className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-full">
-                <span className="material-symbols-outlined">replay_10</span>
-              </button>
-            </div>
-            
-            <div className="flex-1 flex flex-col gap-1 px-4">
-              <div className="flex justify-between text-[10px] font-mono text-on-surface-variant uppercase">
-                <span>Replay Timeline</span>
-                <span>00:00 / 00:00</span>
-              </div>
-              <div className="relative h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden group cursor-pointer">
-                <div className="absolute top-0 left-0 h-full w-[0%] bg-primary"></div>
-                <div className="absolute top-0 left-[0%] -translate-x-1/2 w-3 h-3 bg-white border-2 border-primary rounded-full -translate-y-0.5 shadow-lg group-hover:scale-125 transition-transform"></div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-space-lg">
-              <div className="flex flex-col items-end">
-                <span className="text-[10px] font-bold text-secondary flex items-center gap-1 uppercase">
-                  <span className={`w-1 h-1 rounded-full ${connected ? 'bg-secondary' : 'bg-red-500'}`}></span>
-                  {connected ? 'In Sync' : 'Offline'}
-                </span>
-                <span className="text-[9px] text-on-surface-variant font-mono">12ms latency</span>
-              </div>
-              <div className="h-8 w-px bg-subtle"></div>
-              <button className="flex items-center gap-2 p-2 text-on-surface-variant hover:text-primary transition-colors">
-                <span className="material-symbols-outlined text-[20px]">videocam</span>
-              </button>
-              <button className="flex items-center gap-2 p-2 text-on-surface-variant hover:text-primary transition-colors">
-                <span className="material-symbols-outlined text-[20px]">chat</span>
-              </button>
-            </div>
-          </footer>
+          <SyncSpaceWhiteboard />
         </main>
       </div>
     </div>
