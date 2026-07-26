@@ -5,6 +5,7 @@ import { RoomNavBar } from "@/components/RoomNavBar";
 import { SyncSpaceWhiteboard } from "@/components/SyncSpaceWhiteboard";
 import { useSocketRoom, type UserPresence } from "@/hooks/useSocketRoom";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 export default function Room() {
   const { roomId } = useParams<{ roomId: string }>();
@@ -121,20 +122,20 @@ export default function Room() {
           <div className="p-2 bg-primary/10 rounded-lg text-primary">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>tactic</span>
           </div>
-          <button className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg">
+          <button onClick={() => setLocation('/')} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="Dashboard">
             <span className="material-symbols-outlined">dashboard</span>
           </button>
-          <button className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg">
+          <button onClick={() => toast.info('History tracking is coming soon!')} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="History">
             <span className="material-symbols-outlined">history</span>
           </button>
-          <button className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg">
+          <button onClick={() => toast.info(`There are ${activeUsers.length} active users in this room.`)} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="Active Users">
             <span className="material-symbols-outlined">group</span>
           </button>
           <div className="mt-auto flex flex-col gap-space-lg">
-            <button className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg">
+            <button onClick={() => toast.info('Shortcuts and help panel coming soon!')} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="Help">
               <span className="material-symbols-outlined">help</span>
             </button>
-            <button className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg">
+            <button onClick={() => toast.info('Room settings coming soon!')} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="Settings">
               <span className="material-symbols-outlined">settings</span>
             </button>
           </div>

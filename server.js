@@ -30,6 +30,7 @@ connectDB();
 // Define Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/rooms', require('./routes/rooms'));
+app.use('/api/projects', require('./routes/projects'));
 
 // --- Socket.io Setup ---
 const io = new Server(server, {

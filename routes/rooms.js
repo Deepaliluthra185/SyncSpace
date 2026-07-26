@@ -9,7 +9,7 @@ const crypto = require('crypto');
 // @access  Private
 router.post('/', auth, async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, projectId } = req.body;
     
     if (!name) {
       return res.status(400).json({ msg: 'Please enter a room name' });
@@ -20,12 +20,13 @@ router.post('/', auth, async (req, res) => {
     const newRoom = new Room({
       roomId,
       name,
-      creator: req.user.id
+      creator: req.user.id,
+      project: projectId || null
     });
 
     const room = await newRoom.save();
     // Return room mapping roomId to id for frontend
-    res.json({ id: room.roomId, name: room.name, creator: room.creator, createdAt: room.createdAt });
+    res.json({ id: room.roomId, name: room.name, creator: room.creator, project: room.project, createdAt: room.createdAt });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');

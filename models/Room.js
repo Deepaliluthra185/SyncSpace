@@ -23,6 +23,11 @@ const RoomSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  project: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Project',
+    default: null
+  }
 });
 
 module.exports = mongoose.model('Room', RoomSchema);
