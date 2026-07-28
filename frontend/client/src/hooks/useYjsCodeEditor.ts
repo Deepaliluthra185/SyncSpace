@@ -20,6 +20,8 @@ export function useYjsCodeEditor({
   const providerRef = useRef<WebsocketProvider | null>(null);
   const [code, setCode] = useState("");
   const [connected, setConnected] = useState(false);
+  const [yText, setYText] = useState<Y.Text | null>(null);
+  const [provider, setProvider] = useState<WebsocketProvider | null>(null);
 
   useEffect(() => {
     // Initialize Yjs document
@@ -27,14 +29,17 @@ export function useYjsCodeEditor({
     ydocRef.current = ydoc;
 
     // Create shared text type
-    const yText = ydoc.getText("shared-code");
-    yTextRef.current = yText;
+    const yTextType = ydoc.getText("shared-code");
+    yTextRef.current = yTextType;
+    setYText(yTextType);
 
     // Initialize WebSocket provider for Yjs
-    const defaultWsUrl = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`;
+    const defaultWsUrl = window.location.hostname === 'localhost' 
+      ? 'ws://localhost:5000' 
+      : `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`;
     const wsUrl = import.meta.env.VITE_WS_URL || defaultWsUrl;
 
-    const provider = new WebsocketProvider(
+    const wsProvider = new WebsocketProvider(
       wsUrl,
       `room-${roomId}`,
       ydoc,
@@ -44,10 +49,11 @@ export function useYjsCodeEditor({
       }
     );
 
-    providerRef.current = provider;
+    providerRef.current = wsProvider;
+    setProvider(wsProvider);
 
     // Set up awareness (presence)
-    const awareness_ = provider.awareness;
+    const awareness_ = wsProvider.awareness;
     if (awareness_) {
       awareness_.setLocalState({
         user: {
@@ -59,36 +65,36 @@ export function useYjsCodeEditor({
     }
 
     // Listen to connection events
-    provider.on("sync", (isSynced: boolean) => {
+    wsProvider.on("sync", (isSynced: boolean) => {
       console.log("[Yjs] Sync status:", isSynced);
       setConnected(isSynced);
     });
 
-    provider.on("connection-close", () => {
+    wsProvider.on("connection-close", () => {
       console.log("[Yjs] Connection closed");
       setConnected(false);
     });
 
-    provider.on("connection-error", (error: any) => {
+    wsProvider.on("connection-error", (error: any) => {
       console.error("[Yjs] Connection error:", error);
       setConnected(false);
     });
 
     // Listen to text changes
     const handleYTextChange = (event: Y.YTextEvent) => {
-      const newCode = yText.toString();
+      const newCode = yTextType.toString();
       setCode(newCode);
       onCodeChange?.(newCode);
     };
 
-    yText.observe(handleYTextChange);
+    yTextType.observe(handleYTextChange);
 
     // Set initial code
-    setCode(yText.toString());
+    setCode(yTextType.toString());
 
     return () => {
-      yText.unobserve(handleYTextChange);
-      provider.disconnect();
+      yTextType.unobserve(handleYTextChange);
+      wsProvider.disconnect();
       ydoc.destroy();
     };
   }, [roomId, userId, userName]); // Removed onCodeChange to prevent reconnect loops
@@ -143,5 +149,7 @@ export function useYjsCodeEditor({
     updateCode,
     insertText,
     deleteText,
+    yText,
+    provider,
   };
 }

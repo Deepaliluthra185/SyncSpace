@@ -9,24 +9,30 @@ const crypto = require('crypto');
 // @access  Private
 router.post('/', auth, async (req, res) => {
   try {
-    const { name, projectId } = req.body;
+    const { name, projectId, generateMeetLink } = req.body;
     
     if (!name) {
       return res.status(400).json({ msg: 'Please enter a room name' });
     }
 
     const roomId = crypto.randomBytes(3).toString('hex').toUpperCase();
+    
+    let meetLink = null;
+    if (generateMeetLink) {
+      meetLink = `https://meet.jit.si/SyncSpace-${roomId}-${crypto.randomBytes(4).toString('hex')}`;
+    }
 
     const newRoom = new Room({
       roomId,
       name,
       creator: req.user.id,
-      project: projectId || null
+      project: projectId || null,
+      meetLink
     });
 
     const room = await newRoom.save();
     // Return room mapping roomId to id for frontend
-    res.json({ id: room.roomId, name: room.name, creator: room.creator, project: room.project, createdAt: room.createdAt });
+    res.json({ id: room.roomId, name: room.name, creator: room.creator, project: room.project, createdAt: room.createdAt, meetLink: room.meetLink });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
@@ -68,7 +74,7 @@ router.get('/:id', auth, async (req, res) => {
       await room.save();
     }
 
-    res.json({ id: room.roomId, name: room.name, creator: room.creator, participants: room.participants, createdAt: room.createdAt });
+    res.json({ id: room.roomId, name: room.name, creator: room.creator, participants: room.participants, createdAt: room.createdAt, meetLink: room.meetLink });
   } catch (err) {
     console.error(err.message);
     if (err.kind === 'ObjectId') {

@@ -33,6 +33,12 @@ export function useSocketRoom({
   const [connected, setConnected] = useState(false);
   const [activeUsers, setActiveUsers] = useState<UserPresence[]>([]);
 
+  const callbacksRef = useRef({ onUsersUpdated, onCodeChange, onCursorMove, onError });
+  
+  useEffect(() => {
+    callbacksRef.current = { onUsersUpdated, onCodeChange, onCursorMove, onError };
+  }, [onUsersUpdated, onCodeChange, onCursorMove, onError]);
+
   useEffect(() => {
     // Initialize Socket.io connection
     const socket = io(import.meta.env.VITE_API_URL || window.location.origin, {
@@ -66,20 +72,20 @@ export function useSocketRoom({
     socket.on("users-updated", (data: { users: UserPresence[] }) => {
       console.log("[Socket.io] Users updated:", data.users);
       setActiveUsers(data.users);
-      onUsersUpdated?.(data.users);
+      callbacksRef.current.onUsersUpdated?.(data.users);
     });
 
     socket.on("code-change", (data: { update: any }) => {
-      onCodeChange?.(data.update);
+      callbacksRef.current.onCodeChange?.(data.update);
     });
 
     socket.on("cursor-move", (data: { userId: string; line: number; column: number }) => {
-      onCursorMove?.(data);
+      callbacksRef.current.onCursorMove?.(data);
     });
 
     socket.on("error", (error: any) => {
       console.error("[Socket.io] Error:", error);
-      onError?.(error);
+      callbacksRef.current.onError?.(error);
     });
 
     return () => {
@@ -88,7 +94,7 @@ export function useSocketRoom({
       }
       socket.disconnect();
     };
-  }, [roomId, userId, userName, userEmail, onUsersUpdated, onCodeChange, onCursorMove, onError]);
+  }, [roomId, userId, userName, userEmail]);
 
   const broadcastCodeChange = useCallback(
     (update: any) => {

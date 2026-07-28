@@ -3,9 +3,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { 
+  LayoutDashboard, Layout, History, Users, LogOut, 
+  Plus, FolderPlus, FolderKanban, ChevronRight, ArrowLeft, LogIn, Code2
+} from "lucide-react";
 
 export default function Home() {
   const { user, isLoading: authLoading, logout } = useAuth();
@@ -17,6 +23,7 @@ export default function Home() {
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [createRoomName, setCreateRoomName] = useState("");
+  const [generateMeetLink, setGenerateMeetLink] = useState(false);
   
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [topNavTab, setTopNavTab] = useState("Dashboard");
@@ -94,7 +101,8 @@ export default function Home() {
         },
         body: JSON.stringify({ 
           name: createRoomName.trim(),
-          projectId: activeProject ? activeProject._id : null 
+          projectId: activeProject ? activeProject._id : null,
+          generateMeetLink
         })
       });
       
@@ -104,6 +112,7 @@ export default function Home() {
         toast.success("Room created successfully!");
         setIsCreateModalOpen(false);
         setCreateRoomName("");
+        setGenerateMeetLink(false);
         setLocation(`/room/${data.id}`);
       } else {
         toast.error(data.msg || data.error || "Failed to create room");
@@ -185,114 +194,149 @@ export default function Home() {
 
   if (authLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-surface-lowest">
-        <Spinner className="h-8 w-8 text-primary" />
+      <div className="flex h-screen items-center justify-center bg-[#050505]">
+        <Spinner className="h-8 w-8 text-blue-500" />
       </div>
     );
   }
 
   return (
-    <div className="dark bg-surface-lowest min-h-screen text-on-surface font-['Geist'] flex">
-      <aside className="fixed left-0 top-0 h-screen w-[240px] bg-surface-low border-r border-subtle flex flex-col py-space-lg z-50">
-        <div className="px-space-lg mb-8">
-          <h1 className="font-headline-md text-headline-md font-bold text-primary">SyncSpace</h1>
-          <p className="font-label-sm text-on-surface-variant">Enterprise Plan</p>
+    <div className="dark bg-[#050505] min-h-screen text-slate-200 font-['Geist'] flex relative overflow-hidden">
+      
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[40rem] h-[40rem] bg-blue-600/10 rounded-full mix-blend-screen filter blur-[120px] animate-pulse-gentle"></div>
+        <div className="absolute bottom-0 right-1/4 w-[30rem] h-[30rem] bg-indigo-600/10 rounded-full mix-blend-screen filter blur-[120px] animate-pulse-gentle" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* Sidebar */}
+      <aside className="fixed left-0 top-0 h-screen w-[260px] bg-white/[0.02] backdrop-blur-xl border-r border-white/10 flex flex-col py-8 z-50">
+        <div className="px-8 mb-10 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <Code2 className="text-white h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-white tracking-tight">SyncSpace</h1>
+            <p className="text-xs text-blue-400 font-medium">Enterprise Plan</p>
+          </div>
         </div>
+        
         <button 
           onClick={() => setIsCreateModalOpen(true)}
           disabled={isCreating}
-          className="mx-space-lg mb-8 bg-primary text-on-primary font-label-md py-space-sm px-space-md rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity cursor-pointer">
+          className="mx-6 mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 transition-all group cursor-pointer border border-white/10">
           {isCreating ? (
-            <Spinner className="h-4 w-4" />
+            <Spinner className="h-4 w-4 text-white" />
           ) : (
-            <span className="material-symbols-outlined text-[18px]">add</span>
+            <Plus className="h-5 w-5 opacity-90 group-hover:scale-110 transition-transform" />
           )}
           New Session
         </button>
-        <nav className="flex-1 space-y-1">
-          <a onClick={() => { setActiveTab("Dashboard"); setTopNavTab("Dashboard"); }} className={`flex items-center px-space-lg py-2 cursor-pointer font-body-md transition-colors ${activeTab === "Dashboard" ? "text-primary border-l-2 border-primary bg-primary/10" : "text-on-surface-variant hover:bg-surface-mid"}`}>
-            <span className="material-symbols-outlined mr-3">dashboard</span>
+        
+        <nav className="flex-1 space-y-1.5 px-3">
+          <a onClick={() => { setActiveTab("Dashboard"); setTopNavTab("Dashboard"); }} className={`flex items-center px-4 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Dashboard" ? "text-white bg-white/10 shadow-sm border border-white/5" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <LayoutDashboard className={`mr-3 h-4 w-4 ${activeTab === "Dashboard" ? "text-blue-400" : ""}`} />
             Dashboard
           </a>
-          <a onClick={() => setActiveTab("Workspace")} className={`flex items-center px-space-lg py-2 cursor-pointer font-body-md transition-colors ${activeTab === "Workspace" ? "text-primary border-l-2 border-primary bg-primary/10" : "text-on-surface-variant hover:bg-surface-mid"}`}>
-            <span className="material-symbols-outlined mr-3">tactic</span>
+          <a onClick={() => setActiveTab("Workspace")} className={`flex items-center px-4 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Workspace" ? "text-white bg-white/10 shadow-sm border border-white/5" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <Layout className={`mr-3 h-4 w-4 ${activeTab === "Workspace" ? "text-blue-400" : ""}`} />
             Workspace
           </a>
-          <a onClick={() => setActiveTab("History")} className={`flex items-center px-space-lg py-2 cursor-pointer font-body-md transition-colors ${activeTab === "History" ? "text-primary border-l-2 border-primary bg-primary/10" : "text-on-surface-variant hover:bg-surface-mid"}`}>
-            <span className="material-symbols-outlined mr-3">history</span>
+          <a onClick={() => setActiveTab("History")} className={`flex items-center px-4 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "History" ? "text-white bg-white/10 shadow-sm border border-white/5" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <History className={`mr-3 h-4 w-4 ${activeTab === "History" ? "text-blue-400" : ""}`} />
             History
           </a>
-          <a onClick={() => setActiveTab("Team")} className={`flex items-center px-space-lg py-2 cursor-pointer font-body-md transition-colors ${activeTab === "Team" ? "text-primary border-l-2 border-primary bg-primary/10" : "text-on-surface-variant hover:bg-surface-mid"}`}>
-            <span className="material-symbols-outlined mr-3">group</span>
+          <a onClick={() => setActiveTab("Team")} className={`flex items-center px-4 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Team" ? "text-white bg-white/10 shadow-sm border border-white/5" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <Users className={`mr-3 h-4 w-4 ${activeTab === "Team" ? "text-blue-400" : ""}`} />
             Team
           </a>
         </nav>
-        <div className="mt-auto border-t border-subtle pt-space-lg px-space-sm space-y-1">
-          <div className="flex items-center gap-3 px-space-lg py-space-md">
-            <div className="w-8 h-8 rounded-full border-2 border-primary bg-surface-mid flex items-center justify-center font-bold text-primary uppercase">
-              {user?.username?.charAt(0) || 'U'}
+        
+        <div className="mt-auto px-6">
+          <div className="glass-panel rounded-2xl p-3 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-inner">
+              {user?.username?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div className="overflow-hidden flex-1">
-              <p className="font-label-md text-on-surface truncate">{user?.username || 'User'}</p>
+              <p className="text-sm font-semibold text-white truncate">{user?.username || 'User'}</p>
             </div>
-            <button onClick={() => logout()} className="material-symbols-outlined text-on-surface-variant hover:text-error transition-colors cursor-pointer ml-auto" title="Logout">
-              logout
+            <button onClick={() => logout()} className="text-slate-400 hover:text-red-400 transition-colors cursor-pointer p-1.5 rounded-lg hover:bg-red-400/10" title="Logout">
+              <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>
       </aside>
 
-      <main className="ml-[240px] flex flex-col flex-1 min-h-screen">
-        <header className="h-12 px-space-lg flex justify-between items-center bg-surface-low border-b border-subtle sticky top-0 z-40">
-          <div className="flex items-center gap-space-xl">
-            <nav className="flex gap-space-lg">
-              <a className={`font-label-md cursor-pointer transition-colors ${topNavTab === "Projects" ? "text-primary" : "text-on-surface-variant hover:text-primary"}`} onClick={() => { setTopNavTab("Projects"); setActiveProject(null); setActiveTab("Workspace"); }}>Projects</a>
-              <a className="font-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" onClick={() => toast.info('Shared sessions coming soon')}>Shared</a>
+      {/* Main Content */}
+      <main className="ml-[260px] flex flex-col flex-1 min-h-screen relative z-10">
+        
+        <header className="h-16 px-8 flex justify-between items-center bg-white/[0.01] backdrop-blur-md border-b border-white/10 sticky top-0 z-40">
+          <div className="flex items-center gap-8">
+            <nav className="flex gap-6">
+              <a className={`text-sm font-medium cursor-pointer transition-all ${topNavTab === "Projects" ? "text-white text-glow" : "text-slate-400 hover:text-white"}`} onClick={() => { setTopNavTab("Projects"); setActiveProject(null); setActiveTab("Workspace"); }}>Projects</a>
+              <a className="text-sm font-medium text-slate-400 hover:text-white transition-all cursor-pointer" onClick={() => toast.info('Shared sessions coming soon')}>Shared</a>
             </nav>
           </div>
-          <div className="flex items-center gap-space-md">
-            <button onClick={() => setIsCreateModalOpen(true)} disabled={isCreating} className="font-label-md px-3 py-1 bg-secondary text-on-secondary rounded hover:opacity-90 transition-opacity cursor-pointer">Go Live</button>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setIsCreateModalOpen(true)} disabled={isCreating} className="text-sm font-medium px-4 py-1.5 glass-button text-white rounded-lg cursor-pointer flex items-center gap-2 border border-white/10">
+              <Plus className="h-4 w-4 text-blue-400" />
+              Go Live
+            </button>
           </div>
         </header>
 
-        <section className="p-space-xl flex-1 max-w-[1400px] mx-auto w-full overflow-y-auto">
+        <section className="p-8 md:p-12 flex-1 max-w-[1400px] mx-auto w-full overflow-y-auto">
           {topNavTab === "Projects" ? (
             <>
               {activeProject ? (
-                <div>
-                  <div className="flex items-center gap-4 mb-space-xl text-on-surface-variant">
-                    <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors" onClick={() => setActiveProject(null)}>arrow_back</span>
-                    <span className="font-label-lg cursor-pointer hover:text-primary transition-colors" onClick={() => setActiveProject(null)}>Projects</span>
-                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-                    <h2 className="font-headline-lg text-headline-lg text-on-surface">{activeProject.name}</h2>
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex items-center gap-3 mb-8 text-slate-400">
+                    <button className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer" onClick={() => setActiveProject(null)}>
+                      <ArrowLeft className="h-5 w-5" />
+                    </button>
+                    <span className="text-sm font-medium cursor-pointer hover:text-white transition-colors" onClick={() => setActiveProject(null)}>Projects</span>
+                    <ChevronRight className="h-4 w-4" />
+                    <h2 className="text-2xl font-bold text-white tracking-tight">{activeProject.name}</h2>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-                    <div onClick={() => setIsCreateModalOpen(true)} className="group bg-surface-low border border-subtle border-dashed rounded-lg p-space-lg hover:border-primary hover:bg-surface-mid transition-all duration-300 flex flex-col min-h-[220px] cursor-pointer items-center justify-center text-center">
-                      <div className="w-12 h-12 rounded-full bg-surface-mid group-hover:bg-primary/20 flex items-center justify-center mb-4 transition-colors">
-                         <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">add</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div onClick={() => setIsCreateModalOpen(true)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer items-center justify-center text-center group border-dashed border-white/20">
+                      <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-blue-500/20 flex items-center justify-center mb-4 transition-all duration-300 shadow-inner border border-white/5">
+                         <Plus className="h-6 w-6 text-slate-400 group-hover:text-blue-400 transition-colors" />
                       </div>
-                      <h3 className="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Create New Session</h3>
+                      <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">New Session</h3>
                     </div>
                     {rooms.filter((r) => r.project === activeProject._id).map((room: any) => (
-                      <div key={room._id} onClick={() => setLocation(`/room/${room.roomId}`)} className="group bg-surface-low border border-subtle rounded-lg p-space-lg hover:border-primary hover:bg-surface-mid transition-all duration-300 flex flex-col min-h-[220px] cursor-pointer">
-                        <h3 className="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors mb-1">{room.name}</h3>
+                      <div key={room._id} onClick={() => setLocation(`/room/${room.roomId}`)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer group">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20">
+                          <Code2 className="h-5 w-5 text-blue-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-300 transition-colors">{room.name}</h3>
+                        <p className="text-xs text-slate-400 mt-auto flex items-center gap-1">
+                           <History className="h-3 w-3" /> Updated recently
+                        </p>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div>
-                  <div className="flex justify-between items-end mb-space-xl">
-                    <h2 className="font-headline-lg text-headline-lg text-on-surface">Your Projects</h2>
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex justify-between items-end mb-8">
+                    <h2 className="text-3xl font-bold text-white tracking-tight">Your Projects</h2>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
-                    <div onClick={() => setIsCreateProjectModalOpen(true)} className="group bg-surface-low border border-subtle border-dashed rounded-lg p-space-lg hover:border-primary hover:bg-surface-mid transition-all duration-300 flex flex-col min-h-[160px] cursor-pointer items-center justify-center text-center">
-                      <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">create_new_folder</span>
-                      <h3 className="font-headline-md mt-2 text-on-surface group-hover:text-primary transition-colors">Create Project</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div onClick={() => setIsCreateProjectModalOpen(true)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[180px] cursor-pointer items-center justify-center text-center group border-dashed border-white/20">
+                      <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center mb-3 transition-all duration-300 shadow-inner border border-white/5">
+                        <FolderPlus className="h-6 w-6 text-slate-400 group-hover:text-indigo-400 transition-colors" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">Create Project</h3>
                     </div>
                     {projects.map((project: any) => (
-                      <div key={project._id} onClick={() => setActiveProject(project)} className="group bg-surface-low border border-subtle rounded-lg p-space-lg hover:border-primary hover:bg-surface-mid transition-all duration-300 flex flex-col min-h-[160px] cursor-pointer">
-                        <h3 className="font-headline-md text-on-surface group-hover:text-primary transition-colors">{project.name}</h3>
+                      <div key={project._id} onClick={() => setActiveProject(project)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[180px] cursor-pointer group">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-4 border border-indigo-500/20">
+                          <FolderKanban className="h-5 w-5 text-indigo-400" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-white mb-1 group-hover:text-indigo-300 transition-colors">{project.name}</h3>
+                        <p className="text-xs text-slate-400 mt-auto">{rooms.filter((r) => r.project === project._id).length} sessions</p>
                       </div>
                     ))}
                   </div>
@@ -300,51 +344,102 @@ export default function Home() {
               )}
             </>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-              {activeTab === "Dashboard" && (
-                <>
-                  <div onClick={() => setIsCreateModalOpen(true)} className="group bg-surface-low border border-subtle border-dashed rounded-lg p-space-lg hover:border-primary hover:bg-surface-mid transition-all duration-300 flex flex-col min-h-[220px] cursor-pointer items-center justify-center text-center">
-                    <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary">add</span>
-                    <h3 className="font-headline-md text-on-surface">Create New Session</h3>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <h2 className="text-3xl font-bold text-white tracking-tight mb-8">
+                {activeTab === "Dashboard" ? "Recent Sessions" : `${activeTab} Sessions`}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {activeTab === "Dashboard" && (
+                  <>
+                    <div onClick={() => setIsCreateModalOpen(true)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer items-center justify-center text-center group border-dashed border-white/20">
+                      <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-blue-500/20 flex items-center justify-center mb-4 transition-all duration-300 shadow-inner border border-white/5">
+                        <Plus className="h-6 w-6 text-slate-400 group-hover:text-blue-400 transition-colors" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">New Session</h3>
+                    </div>
+                    <div onClick={() => setIsJoinModalOpen(true)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer items-center justify-center text-center group border-dashed border-white/20">
+                      <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-purple-500/20 flex items-center justify-center mb-4 transition-all duration-300 shadow-inner border border-white/5">
+                        <LogIn className="h-6 w-6 text-slate-400 group-hover:text-purple-400 transition-colors" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">Join Session</h3>
+                    </div>
+                  </>
+                )}
+                {displayRooms.map((room: any) => (
+                  <div key={room._id} onClick={() => setLocation(`/room/${room.roomId}`)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer group">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20">
+                      <Code2 className="h-5 w-5 text-blue-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-300 transition-colors">{room.name}</h3>
+                    <p className="text-xs text-slate-400 mt-auto flex items-center gap-1">
+                      <History className="h-3 w-3" /> {new Date(room.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
-                  <div onClick={() => setIsJoinModalOpen(true)} className="group bg-surface-low border border-subtle border-dashed rounded-lg p-space-lg hover:border-primary hover:bg-surface-mid transition-all duration-300 flex flex-col min-h-[220px] cursor-pointer items-center justify-center text-center">
-                    <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary">login</span>
-                    <h3 className="font-headline-md text-on-surface">Join Existing Session</h3>
-                  </div>
-                </>
-              )}
-              {displayRooms.map((room: any) => (
-                <div key={room._id} onClick={() => setLocation(`/room/${room.roomId}`)} className="group bg-surface-low border border-subtle rounded-lg p-space-lg hover:border-primary cursor-pointer">
-                  <h3 className="font-headline-md text-on-surface">{room.name}</h3>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </section>
       </main>
 
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent>
-          <DialogTitle>Create New Session</DialogTitle>
-          <Input value={createRoomName} onChange={(e) => setCreateRoomName(e.target.value)} placeholder="Session Name" />
-          <Button onClick={handleCreateRoom}>Create</Button>
+        <DialogContent className="glass-panel border-white/10 text-white sm:max-w-md">
+          <DialogTitle className="text-xl font-bold tracking-tight">Create New Session</DialogTitle>
+          <div className="py-4 space-y-4">
+            <Input 
+              value={createRoomName} 
+              onChange={(e) => setCreateRoomName(e.target.value)} 
+              placeholder="Session Name" 
+              className="bg-black/20 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 h-11"
+              autoFocus
+            />
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="generate-meet" 
+                checked={generateMeetLink}
+                onCheckedChange={(checked) => setGenerateMeetLink(checked as boolean)}
+              />
+              <Label htmlFor="generate-meet" className="text-sm font-medium text-slate-300 cursor-pointer">
+                Generate Video Meeting Link (Jitsi Meet)
+              </Label>
+            </div>
+          </div>
+          <Button onClick={handleCreateRoom} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg h-11 border-0">
+            Create
+          </Button>
         </DialogContent>
       </Dialog>
 
       <Dialog open={isJoinModalOpen} onOpenChange={setIsJoinModalOpen}>
-        <DialogContent>
-          <DialogTitle>Join Existing Session</DialogTitle>
-          <Input value={joinRoomId} onChange={(e) => setJoinRoomId(e.target.value)} placeholder="Session ID" />
-          <Button onClick={handleJoinRoom}>Join</Button>
+        <DialogContent className="glass-panel border-white/10 text-white sm:max-w-md">
+          <DialogTitle className="text-xl font-bold tracking-tight">Join Existing Session</DialogTitle>
+          <div className="py-4">
+            <Input 
+              value={joinRoomId} 
+              onChange={(e) => setJoinRoomId(e.target.value)} 
+              placeholder="Session ID" 
+              className="bg-black/20 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 h-11"
+              autoFocus
+            />
+          </div>
+          <Button onClick={handleJoinRoom} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg h-11 border-0">
+            Join
+          </Button>
         </DialogContent>
       </Dialog>
 
       <Dialog open={isCreateProjectModalOpen} onOpenChange={setIsCreateProjectModalOpen}>
-        <DialogContent>
-          <DialogTitle>Create Project</DialogTitle>
+        <DialogContent className="glass-panel border-white/10 text-white sm:max-w-md">
+          <DialogTitle className="text-xl font-bold tracking-tight">Create Project</DialogTitle>
           <form onSubmit={handleCreateProject} className="grid gap-4 py-4">
-            <Input value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)} placeholder="Project Name" autoFocus />
-            <Button type="submit" disabled={isCreatingProject}>
+            <Input 
+              value={newProjectName} 
+              onChange={(e) => setNewProjectName(e.target.value)} 
+              placeholder="Project Name" 
+              className="bg-black/20 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 h-11"
+              autoFocus 
+            />
+            <Button type="submit" disabled={isCreatingProject} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg h-11 border-0">
                {isCreatingProject ? <Spinner className="h-4 w-4 mr-2" /> : null}
                Create Project
             </Button>

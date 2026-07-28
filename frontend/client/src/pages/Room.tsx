@@ -3,9 +3,14 @@ import { useParams, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { RoomNavBar } from "@/components/RoomNavBar";
 import { SyncSpaceWhiteboard } from "@/components/SyncSpaceWhiteboard";
+import { CollaborativeCodeEditor } from "@/components/CollaborativeCodeEditor";
+import { SplitPanelLayout } from "@/components/SplitPanelLayout";
 import { useSocketRoom, type UserPresence } from "@/hooks/useSocketRoom";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
+import { 
+  LayoutDashboard, History, Users, HelpCircle, Settings, Code2 
+} from "lucide-react";
 
 export default function Room() {
   const { roomId } = useParams<{ roomId: string }>();
@@ -13,6 +18,7 @@ export default function Room() {
   const { user, isLoading: authLoading } = useAuth();
   const [roomName, setRoomName] = useState("Loading...");
   const [roomCreator, setRoomCreator] = useState<string | null>(null);
+  const [meetLink, setMeetLink] = useState<string | null>(null);
   const [activeUsers, setActiveUsers] = useState<UserPresence[]>([]);
   const [roomLoading, setRoomLoading] = useState(true);
   const [roomError, setRoomError] = useState(false);
@@ -33,6 +39,7 @@ export default function Room() {
         if (res.ok && data.id) {
           setRoomName(data.name);
           setRoomCreator(data.creator);
+          setMeetLink(data.meetLink || null);
         } else {
           setRoomError(true);
         }
@@ -60,8 +67,6 @@ export default function Room() {
     },
   });
 
-
-
   // Broadcast user activity periodically
   useEffect(() => {
     if (!connected) return;
@@ -73,10 +78,10 @@ export default function Room() {
 
   if (authLoading || roomLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
+      <div className="flex h-screen items-center justify-center bg-[#050505]">
         <div className="flex flex-col items-center gap-4">
-          <Spinner className="h-8 w-8" />
-          <p className="text-sm text-muted-foreground">Loading room...</p>
+          <Spinner className="h-8 w-8 text-blue-500" />
+          <p className="text-sm text-slate-400 font-medium">Loading workspace...</p>
         </div>
       </div>
     );
@@ -84,10 +89,13 @@ export default function Room() {
 
   if (!user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="text-lg font-semibold text-foreground">Authentication Required</p>
-          <p className="text-sm text-muted-foreground">Please sign in to access this room.</p>
+      <div className="flex h-screen items-center justify-center bg-[#050505]">
+        <div className="text-center glass-panel p-8 rounded-2xl max-w-md">
+          <p className="text-xl font-bold text-white mb-2">Authentication Required</p>
+          <p className="text-sm text-slate-400 mb-6">Please sign in to access this workspace.</p>
+          <button onClick={() => setLocation('/')} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+            Go to Login
+          </button>
         </div>
       </div>
     );
@@ -95,56 +103,91 @@ export default function Room() {
 
   if (roomError) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="text-lg font-semibold text-foreground">Room Not Found</p>
-          <p className="text-sm text-muted-foreground">The room you're looking for doesn't exist.</p>
+      <div className="flex h-screen items-center justify-center bg-[#050505]">
+        <div className="text-center glass-panel p-8 rounded-2xl max-w-md">
+          <p className="text-xl font-bold text-white mb-2">Workspace Not Found</p>
+          <p className="text-sm text-slate-400 mb-6">The session you're looking for doesn't exist or you don't have access.</p>
+          <button onClick={() => setLocation('/')} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+            Back to Dashboard
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-surface-lowest text-on-surface font-body-md overflow-hidden h-screen flex flex-col">
-      {/* Navigation Bar */}
-      <RoomNavBar
-        roomName={roomName}
-        roomId={roomId || ""}
-        connected={connected}
-        activeUsers={activeUsers}
-        currentUserId={user?.id || ""}
-        roomCreator={roomCreator}
-      />
+    <div className="bg-[#050505] text-slate-200 font-['Geist'] overflow-hidden h-screen flex flex-col relative">
+      {/* Background gradients similar to Home.tsx for a cohesive feel */}
+      <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-[40rem] h-[40rem] bg-indigo-600/5 rounded-full mix-blend-screen filter blur-[120px]"></div>
+      </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* SideNav (Collapsed or Minimal for Workspace) */}
-        <aside className="w-[64px] bg-surface-low border-r border-subtle flex flex-col items-center py-space-lg gap-space-lg">
-          <div className="p-2 bg-primary/10 rounded-lg text-primary">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>tactic</span>
-          </div>
-          <button onClick={() => setLocation('/')} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="Dashboard">
-            <span className="material-symbols-outlined">dashboard</span>
-          </button>
-          <button onClick={() => toast.info('History tracking is coming soon!')} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="History">
-            <span className="material-symbols-outlined">history</span>
-          </button>
-          <button onClick={() => toast.info(`There are ${activeUsers.length} active users in this room.`)} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="Active Users">
-            <span className="material-symbols-outlined">group</span>
-          </button>
-          <div className="mt-auto flex flex-col gap-space-lg">
-            <button onClick={() => toast.info('Shortcuts and help panel coming soon!')} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="Help">
-              <span className="material-symbols-outlined">help</span>
-            </button>
-            <button onClick={() => toast.info('Room settings coming soon!')} className="p-2 text-on-surface-variant hover:bg-surface-mid transition-colors rounded-lg" title="Settings">
-              <span className="material-symbols-outlined">settings</span>
-            </button>
-          </div>
-        </aside>
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Navigation Bar */}
+        <RoomNavBar
+          roomName={roomName}
+          roomId={roomId || ""}
+          connected={connected}
+          activeUsers={activeUsers}
+          currentUserId={user?.id || ""}
+          roomCreator={roomCreator}
+          meetLink={meetLink}
+        />
 
-        {/* Main Workspace Canvas */}
-        <main className="flex-1 flex flex-col relative overflow-hidden bg-surface-lowest">
-          <SyncSpaceWhiteboard />
-        </main>
+        <div className="flex flex-1 overflow-hidden">
+          {/* SideNav (Collapsed or Minimal for Workspace) */}
+          <aside className="w-[64px] bg-white/[0.02] backdrop-blur-xl border-r border-white/10 flex flex-col items-center py-6 gap-6 z-20">
+            <div className="p-2.5 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 rounded-xl text-blue-400 border border-blue-500/20 shadow-inner mb-2 cursor-pointer hover:bg-blue-500/30 transition-colors">
+              <Code2 className="h-5 w-5" />
+            </div>
+            <button onClick={() => setLocation('/')} className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 transition-colors rounded-xl group relative" title="Dashboard">
+              <LayoutDashboard className="h-5 w-5 group-hover:scale-110 transition-transform" />
+            </button>
+            <button onClick={() => toast.info('History tracking is coming soon!')} className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 transition-colors rounded-xl group relative" title="History">
+              <History className="h-5 w-5 group-hover:scale-110 transition-transform" />
+            </button>
+            <button onClick={() => toast.info(`There are ${activeUsers.length} active users in this room.`)} className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 transition-colors rounded-xl group relative" title="Active Users">
+              <Users className="h-5 w-5 group-hover:scale-110 transition-transform" />
+              {activeUsers.length > 1 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full border border-[#050505]"></span>
+              )}
+            </button>
+            <div className="mt-auto flex flex-col gap-4">
+              <button onClick={() => toast.info('Shortcuts and help panel coming soon!')} className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 transition-colors rounded-xl group relative" title="Help">
+                <HelpCircle className="h-5 w-5 group-hover:scale-110 transition-transform" />
+              </button>
+              <button onClick={() => toast.info('Room settings coming soon!')} className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 transition-colors rounded-xl group relative" title="Settings">
+                <Settings className="h-5 w-5 group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
+          </aside>
+
+          {/* Main Workspace Canvas */}
+          <main className="flex-1 flex flex-col relative overflow-hidden bg-transparent">
+            <SplitPanelLayout
+              leftPanel={{
+                content: (
+                  <div className="w-full h-full glass-panel border-0 border-l border-t rounded-tl-2xl overflow-hidden relative">
+                    <SyncSpaceWhiteboard />
+                  </div>
+                )
+              }}
+              rightPanel={{
+                content: (
+                  <div className="w-full h-full glass-panel border-0 border-t overflow-hidden relative border-l border-white/10">
+                    <CollaborativeCodeEditor 
+                      roomId={roomId || ""}
+                      userId={user.id}
+                      userName={user.username || "Anonymous"}
+                      activeUsers={activeUsers}
+                      roomCreator={roomCreator}
+                    />
+                  </div>
+                )
+              }}
+            />
+          </main>
+        </div>
       </div>
     </div>
   );

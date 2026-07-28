@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,13 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [, setLocation] = useLocation();
-  const { login } = useAuth();
+  const { login, token } = useAuth();
+
+  useEffect(() => {
+    if (token) {
+      setLocation("/");
+    }
+  }, [token, setLocation]);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -40,7 +46,6 @@ export default function AuthPage() {
       if (res.ok) {
         login(data.token, data.user);
         toast.success(`Successfully ${isLogin ? 'logged in' : 'registered'}!`);
-        setLocation("/"); // Redirect to home
       } else {
         toast.error(data.msg || "Authentication failed");
       }

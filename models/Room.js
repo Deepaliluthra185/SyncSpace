@@ -23,6 +23,10 @@ const RoomSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  meetLink: {
+    type: String,
+    default: null
+  },
   project: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
