@@ -116,10 +116,10 @@ export default function Room() {
   }
 
   return (
-    <div className="bg-[#050505] text-slate-200 font-['Geist'] overflow-hidden h-screen flex flex-col relative">
+    <div className="bg-[#07050a] text-slate-200 font-['Geist'] overflow-hidden h-screen flex flex-col relative">
       {/* Background gradients similar to Home.tsx for a cohesive feel */}
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-[40rem] h-[40rem] bg-indigo-600/5 rounded-full mix-blend-screen filter blur-[120px]"></div>
+        <div className="absolute top-0 right-1/4 w-[40rem] h-[40rem] bg-purple-600/5 rounded-full mix-blend-screen filter blur-[120px]"></div>
       </div>
 
       <div className="relative z-10 flex flex-col h-full">
@@ -136,8 +136,8 @@ export default function Room() {
 
         <div className="flex flex-1 overflow-hidden">
           {/* SideNav (Collapsed or Minimal for Workspace) */}
-          <aside className="w-[64px] bg-white/[0.02] backdrop-blur-xl border-r border-white/10 flex flex-col items-center py-6 gap-6 z-20">
-            <div className="p-2.5 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 rounded-xl text-blue-400 border border-blue-500/20 shadow-inner mb-2 cursor-pointer hover:bg-blue-500/30 transition-colors">
+          <aside className="w-[64px] bg-[#0c0a10] border-r border-white/5 flex flex-col items-center py-6 gap-6 z-20">
+            <div className="p-2.5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl text-white shadow-lg shadow-purple-500/20 mb-2 cursor-pointer hover:opacity-90 transition-opacity">
               <Code2 className="h-5 w-5" />
             </div>
             <button onClick={() => setLocation('/')} className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 transition-colors rounded-xl group relative" title="Dashboard">

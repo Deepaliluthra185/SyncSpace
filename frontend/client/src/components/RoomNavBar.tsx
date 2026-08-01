@@ -53,11 +53,11 @@ export function RoomNavBar({
   };
 
   return (
-    <header className="flex justify-between items-center h-16 px-8 bg-white/[0.01] backdrop-blur-md border-b border-white/10 z-50">
+    <header className="flex justify-between items-center h-16 px-8 bg-[#0c0a10] border-b border-white/5 z-50">
       <div className="flex items-center gap-6">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform">
               <Code2 className="text-white h-4 w-4" />
             </div>
             <span className="text-lg font-bold text-white tracking-tight group-hover:opacity-90 transition-opacity hidden sm:block">SyncSpace</span>
@@ -68,7 +68,7 @@ export function RoomNavBar({
           <FolderOpen className="text-slate-400 h-4 w-4 hidden sm:block" />
           <span className="text-sm font-semibold text-white">{roomName}</span>
           <span className="text-xs text-slate-400 mx-2 px-2.5 py-1 bg-white/5 rounded-md border border-white/10 flex items-center gap-2">
-            ID: <span className="font-mono text-blue-400 font-medium">{roomId}</span>
+            ID: <span className="font-mono text-purple-400 font-medium">{roomId}</span>
           </span>
           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${connected ? "bg-green-500/10 text-green-400 border border-green-500/20" : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-400 animate-pulse" : "bg-yellow-400"}`}></span>
@@ -80,7 +80,7 @@ export function RoomNavBar({
       <div className="flex items-center gap-8">
         {/* Navigation Links (Contextual) */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <a className="text-blue-400 text-glow" href="#">Workspace</a>
+          <a className="text-purple-400 text-glow" href="#">Workspace</a>
           <a className="text-slate-400 hover:text-white transition-colors" href="#">Shared</a>
           <a className="text-slate-400 hover:text-white transition-colors" href="#">Templates</a>
         </nav>
@@ -96,7 +96,7 @@ export function RoomNavBar({
                 'from-fuchsia-400 to-purple-500'
               ];
               const colorClass = u.userId === currentUserId 
-                ? 'from-blue-400 to-indigo-500' 
+                ? 'from-purple-400 to-pink-500' 
                 : avatarColors[i % 3];
 
               return (
@@ -133,7 +133,7 @@ export function RoomNavBar({
             <span>Invite</span>
           </button>
           
-          <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg text-sm font-bold shadow-lg shadow-blue-500/25 transition-all active:scale-95 border border-white/10">
+          <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white rounded-lg text-sm font-bold shadow-lg shadow-purple-500/25 transition-all active:scale-95 border border-white/10">
             <Radio className="h-4 w-4 animate-pulse-gentle" />
             <span>Go Live</span>
           </button>

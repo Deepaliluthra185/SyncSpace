@@ -82,20 +82,20 @@ export function CollaborativeCodeEditor({
   };
 
   return (
-    <div className="flex h-full flex-col bg-[#0f172a] overflow-hidden">
+    <div className="flex h-full flex-col bg-[#0f0c16] overflow-hidden">
       {/* Top Bar with Tabs */}
-      <div className="flex items-center justify-between border-b border-slate-700/50 bg-slate-900/50 px-4">
+      <div className="flex items-center justify-between border-b border-white/5 bg-[#07050a] px-4">
         <div className="flex items-center">
           <button 
             onClick={() => setActiveTab("code")}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "code" ? "border-blue-500 text-blue-400" : "border-transparent text-slate-400 hover:text-slate-300"}`}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "code" ? "border-purple-500 text-purple-400" : "border-transparent text-slate-400 hover:text-white"}`}
           >
             <Code2 className="h-4 w-4" />
             Code Editor
           </button>
           <button 
             onClick={() => setActiveTab("participants")}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "participants" ? "border-indigo-500 text-indigo-400" : "border-transparent text-slate-400 hover:text-slate-300"}`}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "participants" ? "border-pink-500 text-pink-400" : "border-transparent text-slate-400 hover:text-white"}`}
           >
             <Users className="h-4 w-4" />
             Participants ({activeUsers.length})
@@ -164,7 +164,7 @@ export function CollaborativeCodeEditor({
             </div>
           </div>
         ) : (
-          <div className="w-full h-full bg-[#0a0f1a] p-6 overflow-y-auto">
+          <div className="w-full h-full bg-[#07050a] p-6 overflow-y-auto">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <Users className="h-5 w-5 text-indigo-400" />
               Room Participants
@@ -176,7 +176,7 @@ export function CollaborativeCodeEditor({
                 return (
                   <div key={u.userId} className="glass-panel p-4 rounded-xl flex items-center justify-between border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
                     <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-inner bg-gradient-to-br ${isHost ? 'from-amber-400 to-orange-500' : 'from-indigo-400 to-purple-500'}`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-inner bg-gradient-to-br ${isHost ? 'from-amber-400 to-orange-500' : 'from-purple-400 to-pink-500'}`}>
                         {u.userName.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -207,8 +207,8 @@ export function CollaborativeCodeEditor({
 
       {/* Terminal Panel (Only show when code tab is active) */}
       {activeTab === "code" && (
-        <div className="h-1/3 bg-[#0a0a0a] border-t border-slate-800 flex flex-col">
-          <div className="h-8 bg-slate-900/50 px-4 flex items-center border-b border-slate-800/50 gap-2">
+        <div className="h-1/3 bg-[#07050a] border-t border-white/5 flex flex-col">
+          <div className="h-8 bg-white/5 px-4 flex items-center border-b border-white/5 gap-2">
             <Terminal className="h-3.5 w-3.5 text-slate-500" />
             <span className="text-[10px] text-slate-400 font-mono tracking-wider">TERMINAL</span>
           </div>

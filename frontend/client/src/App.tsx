@@ -5,6 +5,7 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import Room from "./pages/Room";
 import AuthPage from "./pages/AuthPage";
@@ -40,7 +41,8 @@ const ProtectedRoute = ({ component: Component }: { component: any }) => {
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={() => <ProtectedRoute component={Home} />} />
+      <Route path={"/"} component={LandingPage} />
+      <Route path={"/dashboard"} component={() => <ProtectedRoute component={Home} />} />
       <Route path={"/room/:roomId"}>
         {() => <ProtectedRoute component={Room} />}
       </Route>

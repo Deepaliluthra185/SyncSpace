@@ -1,0 +1,271 @@
+import Icon from './global/Icon';
+import UserAvatar from './global/UserAvatar';
+import { useLocation } from 'wouter';
+
+export const displayName = 'Hero Section';
+export const shortDescription = 'Main hero with headline, subtext, CTAs and a product screenshot preview';
+
+const avatarData = [
+  { gender: 'female', heritage: 'East Asian', ageGroup: '25-35', index: 0 },
+  { gender: 'male', heritage: 'European', ageGroup: '25-35', index: 1 },
+  { gender: 'female', heritage: 'African', ageGroup: '18-25', index: 2 },
+  { gender: 'male', heritage: 'South Asian', ageGroup: '25-35', index: 3 },
+];
+
+export default function HeroSection() {
+  const [, setLocation] = useLocation();
+  return (
+    <section className="relative w-full flex flex-col items-center pt-28 pb-16 px-16 overflow-hidden">
+      {/* Background glow blobs */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.28) 0%, rgba(236,72,153,0.14) 45%, transparent 75%)',
+          filter: 'blur(40px)',
+        }}
+      />
+      <div
+        className="absolute top-40 left-24 w-64 h-64 rounded-full pointer-events-none"
+        style={{ background: 'rgba(168,85,247,0.12)', filter: 'blur(60px)' }}
+      />
+      <div
+        className="absolute top-56 right-24 w-80 h-80 rounded-full pointer-events-none"
+        style={{ background: 'rgba(236,72,153,0.1)', filter: 'blur(70px)' }}
+      />
+
+      {/* Badge */}
+      <div
+        className="relative z-10 flex items-center gap-2 px-4 py-1.5 rounded-xl mb-8"
+        style={{
+          background: 'rgba(168,85,247,0.1)',
+          border: '1px solid rgba(168,85,247,0.3)',
+        }}
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-primary" style={{ boxShadow: '0 0 8px #a855f7' }} />
+        <span className="text-xs font-body font-medium text-primary tracking-wide">{'Now in public beta — try it free'}</span>
+      </div>
+
+      {/* Headline */}
+      <h1
+        className="relative z-10 font-headings font-bold text-center leading-tight text-foreground max-w-4xl"
+        style={{ fontSize: '66px', letterSpacing: '-1.5px' }}
+      >
+        {'Build together,'}{' '}
+        <span
+          style={{
+            background: 'linear-gradient(90deg, #a855f7 0%, #ec4899 60%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          {'anywhere.'}
+        </span>
+      </h1>
+
+      {/* Subheadline */}
+      <p className="relative z-10 mt-6 text-lg text-muted-foreground font-body text-center max-w-xl leading-relaxed">
+        {'SyncSpace merges a real-time collaborative whiteboard with a live code editor — so distributed teams can design, brainstorm, and ship without switching tools.'}
+      </p>
+
+      {/* CTA row */}
+      <div className="relative z-10 mt-10 flex items-center gap-4">
+        <button
+          onClick={() => setLocation('/auth')}
+          className="text-base font-body font-medium text-primary-foreground px-7 py-3 rounded-md cursor-pointer transition-transform hover:scale-105"
+          style={{
+            background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+            boxShadow: '0 0 32px rgba(168,85,247,0.55), 0 4px 24px rgba(236,72,153,0.25)',
+          }}
+        >
+          {'Start for free'}
+        </button>
+        <button
+          className="text-base font-body font-medium text-foreground px-7 py-3 rounded-md flex items-center gap-2"
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(168,85,247,0.25)',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          <Icon i="play-circle" size={18} className="text-primary" />
+          {'Watch demo'}
+        </button>
+      </div>
+
+      {/* Social proof avatars */}
+      <div className="relative z-10 mt-8 flex items-center gap-3">
+        <div className="flex items-center -space-x-2">
+          {avatarData.map((a, i) => (
+            <UserAvatar
+              key={i}
+              gender={a.gender}
+              heritage={a.heritage}
+              ageGroup={a.ageGroup}
+              index={a.index}
+              className="w-8 h-8 rounded-full"
+              style={{ border: '2px solid #07060f' }}
+            />
+          ))}
+        </div>
+        <span className="text-sm text-muted-foreground font-body">
+          {'Trusted by'} <span className="text-foreground font-medium">{'12,000+'}</span> {'teams'}
+        </span>
+      </div>
+
+      {/* Product preview */}
+      <ProductPreview />
+    </section>
+  );
+}
+
+function ProductPreview() {
+  return (
+    <div className="relative z-10 mt-20 w-full max-w-5xl">
+      {/* Glow under preview */}
+      <div
+        className="absolute inset-x-12 -bottom-6 h-20 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse, rgba(168,85,247,0.4) 0%, transparent 70%)', filter: 'blur(20px)' }}
+      />
+      <div
+        className="relative rounded-lg overflow-hidden"
+        style={{
+          background: 'rgba(15,12,31,0.8)',
+          border: '1px solid rgba(168,85,247,0.2)',
+          boxShadow: '0 0 60px rgba(168,85,247,0.15), 0 0 120px rgba(236,72,153,0.08)',
+          backdropFilter: 'blur(20px)',
+        }}
+      >
+        {/* Window chrome */}
+        <div
+          className="flex items-center gap-2 px-5 py-3"
+          style={{ borderBottom: '1px solid rgba(168,85,247,0.12)' }}
+        >
+          <span className="w-3 h-3 rounded-full" style={{ background: 'rgba(236,72,153,0.7)' }} />
+          <span className="w-3 h-3 rounded-full" style={{ background: 'rgba(168,85,247,0.5)' }} />
+          <span className="w-3 h-3 rounded-full" style={{ background: 'rgba(6,182,212,0.5)' }} />
+          <span className="ml-4 text-xs text-muted-foreground font-body">{'syncspace.app/team/nova'}</span>
+        </div>
+        {/* Split panel preview */}
+        <div className="flex h-80">
+          {/* Left: whiteboard */}
+          <WhiteboardPreview />
+          {/* Right: code editor */}
+          <CodePreview />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WhiteboardPreview() {
+  const shapes = [
+    { x: 40, y: 30, w: 110, h: 64, label: 'Auth flow' },
+    { x: 200, y: 30, w: 110, h: 64, label: 'API Gateway' },
+    { x: 120, y: 150, w: 130, h: 64, label: 'Database' },
+  ];
+  return (
+    <div className="flex-1 relative" style={{ borderRight: '1px solid rgba(168,85,247,0.12)' }}>
+      {/* Grid dots */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(168,85,247,0.18) 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+        }}
+      />
+      {/* Toolbar */}
+      <div
+        className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-md z-10"
+        style={{ background: 'rgba(26,22,48,0.85)', border: '1px solid rgba(168,85,247,0.2)', backdropFilter: 'blur(8px)' }}
+      >
+        {['pen-tool', 'square', 'circle', 'type', 'move', 'hand'].map(ic => (
+          <button key={ic} className="p-1">
+            <Icon i={ic} size={14} className="text-muted-foreground" />
+          </button>
+        ))}
+      </div>
+      {/* Shapes */}
+      {shapes.map((s, i) => (
+        <div
+          key={i}
+          className="absolute flex items-center justify-center rounded-md text-xs text-foreground font-body font-medium"
+          style={{
+            left: s.x, top: s.y, width: s.w, height: s.h,
+            background: i === 0 ? 'rgba(168,85,247,0.15)' : i === 1 ? 'rgba(6,182,212,0.12)' : 'rgba(236,72,153,0.12)',
+            border: `1px solid ${i === 0 ? 'rgba(168,85,247,0.45)' : i === 1 ? 'rgba(6,182,212,0.4)' : 'rgba(236,72,153,0.4)'}`,
+          }}
+        >
+          {s.label}
+        </div>
+      ))}
+      {/* Connector lines */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible' }}>
+        <line x1="150" y1="94" x2="255" y2="94" stroke="rgba(168,85,247,0.35)" strokeWidth="1.5" strokeDasharray="4 3" />
+        <line x1="150" y1="94" x2="185" y2="150" stroke="rgba(168,85,247,0.35)" strokeWidth="1.5" strokeDasharray="4 3" />
+        <line x1="255" y1="94" x2="255" y2="150" stroke="rgba(6,182,212,0.35)" strokeWidth="1.5" strokeDasharray="4 3" />
+      </svg>
+      {/* Cursor */}
+      <div className="absolute" style={{ left: 195, top: 128 }}>
+        <div className="relative">
+          <Icon i="mouse-pointer-2" size={16} style={{ color: '#ec4899', filter: 'drop-shadow(0 0 5px #ec4899)' }} />
+          <div
+            className="absolute -top-5 left-4 text-xs px-1.5 py-0.5 rounded font-body whitespace-nowrap"
+            style={{ background: '#ec4899', color: 'white', fontSize: '10px' }}
+          >
+            {'Mia'}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CodePreview() {
+  const lines = [
+    { tokens: [{ c: '#7c6f9e', t: '// auth.ts' }] },
+    { tokens: [] },
+    { tokens: [{ c: '#a855f7', t: 'export ' }, { c: '#06b6d4', t: 'async function ' }, { c: '#f0eeff', t: 'signIn' }, { c: '#7c6f9e', t: '(' }, { c: '#ec4899', t: 'email' }, { c: '#7c6f9e', t: ': string) {' }] },
+    { tokens: [{ c: '#7c6f9e', t: '  const ' }, { c: '#f0eeff', t: 'user' }, { c: '#7c6f9e', t: ' = await ' }, { c: '#06b6d4', t: 'db' }, { c: '#7c6f9e', t: '.users.' }, { c: '#f0eeff', t: 'findOne' }, { c: '#7c6f9e', t: '({ email });' }] },
+    { tokens: [{ c: '#7c6f9e', t: '  if ' }, { c: '#f0eeff', t: '(!user)' }, { c: '#7c6f9e', t: ' throw new ' }, { c: '#ec4899', t: 'Error' }, { c: '#7c6f9e', t: '(' }, { c: '#a855f7', t: '"Not found"' }, { c: '#7c6f9e', t: ');' }] },
+    { tokens: [{ c: '#7c6f9e', t: '  return ' }, { c: '#06b6d4', t: 'createSession' }, { c: '#7c6f9e', t: '(user);' }] },
+    { tokens: [{ c: '#7c6f9e', t: '}' }] },
+    { tokens: [] },
+    { tokens: [{ c: '#7c6f9e', t: '// live edit by ' }, { c: '#a855f7', t: 'Kai' }], highlight: true },
+  ];
+  return (
+    <div className="flex-1 flex flex-col" style={{ background: '#0a0818' }}>
+      {/* Tabs */}
+      <div className="flex items-center gap-0 px-2 pt-2" style={{ borderBottom: '1px solid rgba(168,85,247,0.12)' }}>
+        {['auth.ts', 'index.ts', 'types.ts'].map((tab, i) => (
+          <div
+            key={tab}
+            className="px-4 py-1.5 text-xs font-body rounded-t-md"
+            style={i === 0
+              ? { background: 'rgba(168,85,247,0.15)', color: '#f0eeff', borderBottom: '2px solid #a855f7' }
+              : { color: '#7c6f9e' }
+            }
+          >
+            {tab}
+          </div>
+        ))}
+      </div>
+      {/* Code lines */}
+      <div className="flex-1 p-4 font-body text-xs leading-6" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+        {lines.map((line, li) => (
+          <div
+            key={li}
+            className="flex items-center"
+            style={line.highlight
+              ? { background: 'rgba(168,85,247,0.12)', borderLeft: '2px solid #a855f7', paddingLeft: '6px', marginLeft: '-8px', borderRadius: '2px' }
+              : {}}
+          >
+            <span className="w-6 text-right mr-4" style={{ color: 'rgba(124,111,158,0.4)', fontSize: '11px' }}>{li + 1}</span>
+            {line.tokens.map((tok, ti) => (
+              <span key={ti} style={{ color: tok.c }}>{tok.t}</span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -286,3 +286,121 @@
     @apply relative before:absolute before:-inset-px before:bg-gradient-to-r before:from-blue-500 before:to-indigo-500 before:rounded-[inherit] before:-z-10 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300;
   }
 }
+
+/* User provided dialog theme */
+.theme-dialog {
+  --background: #07050a;
+  --foreground: #f0eeff;
+  --primary: #a855f7;
+  --primary-foreground: #ffffff;
+  --secondary: #0f0c16;
+  --secondary-foreground: #f0eeff;
+  --tertiary: #ec4899;
+  --muted: #120f18;
+  --muted-foreground: #7c6f9e;
+  --accent: rgba(255, 255, 255, 0.05);
+  --accent-foreground: #ffffff;
+  --card: #0f0c16;
+  --card-foreground: #f0eeff;
+  --destructive: #FB7185;
+  --border: rgba(255, 255, 255, 0.05);
+  --input: #120f18;
+  --ring: rgba(168, 85, 247, 0.5);
+  --radius: 0.875rem;
+  --font-sans: Inter, sans-serif;
+  --font-heading: Outfit, Inter, sans-serif;
+  --font-mono: JetBrains Mono, monospace;
+  --shadow-offset-x: 0;
+  --shadow-offset-y: 10;
+  --shadow-blur: 30;
+  --shadow-spread: -8;
+  --shadow-color: rgba(15, 23, 42, 0.12);
+  --tertiary-foreground: #07141A;
+  --destructive-foreground: #363535;
+  --primary-text: #9258FF;
+  --secondary-text: #7B7A97;
+  --tertiary-text: #22D3EE;
+  --accent-text: #8076A5;
+  --destructive-text: #FB7185;
+
+  font-family: var(--font-sans);
+}
+
+/* Base fill colors scoped to the dialog to avoid clashing with ShadCN */
+.theme-dialog .bg-card { background-color: var(--card); color: var(--card-foreground); }
+.theme-dialog .bg-popover { background-color: var(--popover); color: var(--popover-foreground, var(--card-foreground)); }
+.theme-dialog .bg-primary { background-color: var(--primary); color: var(--primary-foreground); }
+.theme-dialog .bg-secondary { background-color: var(--secondary); color: var(--secondary-foreground); }
+.theme-dialog .bg-accent { background-color: var(--accent); color: var(--accent-foreground, var(--foreground)); }
+.theme-dialog .bg-tertiary { background-color: var(--tertiary); color: var(--tertiary-foreground, var(--primary-foreground)); }
+.theme-dialog .bg-destructive { background-color: var(--destructive); color: var(--destructive-foreground, var(--primary-foreground)); }
+.theme-dialog .bg-background { background-color: var(--background); color: var(--foreground); }
+
+/* Base text colors */
+.theme-dialog .text-primary { color: var(--primary-text, var(--primary)); }
+.theme-dialog .text-secondary { color: var(--secondary-text, var(--secondary)); }
+.theme-dialog .text-tertiary { color: var(--tertiary-text, var(--tertiary)); }
+.theme-dialog .text-accent { color: var(--accent-text, var(--accent)); }
+.theme-dialog .text-destructive { color: var(--destructive-text, var(--destructive)); }
+.theme-dialog .text-muted-foreground { color: var(--muted-foreground); }
+.theme-dialog .text-primary-foreground { color: var(--primary-foreground); }
+.theme-dialog .text-foreground { color: var(--foreground); }
+
+/* Border colors */
+.theme-dialog .border-border { border-color: var(--border); }
+.theme-dialog .border-primary { border-color: var(--primary); }
+.theme-dialog .border-input { border-color: var(--input); }
+
+/* Gradients */
+.brand-gradient { background-image: linear-gradient(135deg, var(--primary), var(--accent)); }
+.shadow-theme {
+  box-shadow:
+    calc(var(--shadow-offset-x, 0) * 1px) calc(var(--shadow-offset-y, 10) * 1px)
+    calc(var(--shadow-blur, 30) * 1px) calc(var(--shadow-spread, -8) * 1px)
+    var(--shadow-color, rgba(15, 23, 42, 0.12));
+}@theme {
+  /* used via utility-classes, bg-background, text-primary, and many more */
+  --color-background: #07060f;
+  --color-foreground: #f0eeff;
+  --color-border: #2a2440;
+  --color-input: #13102a;
+  --color-primary: #a855f7;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #ec4899;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #1a1630;
+  --color-muted-foreground: #7c6f9e;
+  --color-accent: #06b6d4;
+  --color-accent-foreground: #ffffff;
+  --color-glass: rgba(255,255,255,0.04);
+  --color-glass-border: rgba(168,85,247,0.2);
+  --color-glow-violet: rgba(168,85,247,0.35);
+  --color-glow-pink: rgba(236,72,153,0.3);
+  --color-surface: #0f0c1f;
+  --color-surface-foreground: #c8b8f0;
+
+  /* DO NOT REMOVE: these radius variables are required by the theme editor. */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+
+  /* DONT CHANGE OR REMOVE THIS VARIABLE */
+  --radius: var(--radius-sm);
+
+  /* DO NOT REMOVE: these font variables are required by the theme editor. */
+  /* available fonts: "Inter", "DM Sans", "Nunito", "PT Serif", "Space Grotesk", "IBM Plex Mono", "IBM Plex Sans", "Roboto Slab", "Geist", "Shantell Sans" */
+  --font-body: Inter;
+  --font-headings: Space Grotesk;
+
+  /* Add and change text sizes as you see fit */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 38px;
+  --text-4xl: 52px;
+  --text-5xl: 70px;
+}

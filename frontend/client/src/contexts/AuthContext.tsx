@@ -22,32 +22,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      if (!token) {
+    const checkAuth = async () => {
+      const storedToken = localStorage.getItem('syncspace_token');
+      if (!storedToken) {
         setIsLoading(false);
         return;
       }
+      
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/auth/me`, {
+        const res = await fetch('/api/auth/me', {
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${storedToken}`
           }
         });
+        
         if (res.ok) {
           const userData = await res.json();
           setUser(userData);
+          setToken(storedToken);
         } else {
-          logout();
+          localStorage.removeItem('syncspace_token');
+          setToken(null);
+          setUser(null);
         }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        logout();
+      } catch (err) {
+        console.error('Auth check error', err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchUser();
-  }, [token]);
+    
+    checkAuth();
+  }, []);
 
   const login = (newToken: string, newUser: User) => {
     setToken(newToken);

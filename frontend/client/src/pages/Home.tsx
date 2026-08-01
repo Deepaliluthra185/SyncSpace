@@ -4,14 +4,20 @@ import { useLocation } from "wouter";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { 
-  LayoutDashboard, Layout, History, Users, LogOut, 
-  Plus, FolderPlus, FolderKanban, ChevronRight, ArrowLeft, LogIn, Code2
+  LayoutDashboard, Users, LogOut, Plus, Search, Bell, 
+  Layers, Code2, PenTool, Archive, ChevronsUpDown,
+  Activity, Clock, ChevronRight, Settings
 } from "lucide-react";
+import { CreateRoomDialog } from "@/components/CreateRoomDialog";
+
+// Placeholder data for Team Activity
+const TEAM_ACTIVITY = [
+  { id: 1, user: "Kai Patel", avatar: "https://i.pravatar.cc/150?u=kai", action: "edited auth.ts in", target: "API Gateway — v2", time: "2 min ago" },
+  { id: 2, user: "Sofia Chen", avatar: "https://i.pravatar.cc/150?u=sofia", action: "added a diagram to", target: "Auth Flow Redesign", time: "15 min ago" },
+  { id: 3, user: "James Carter", avatar: "https://i.pravatar.cc/150?u=james", action: "commented on", target: "Q3 Sprint Planning", time: "1h ago" },
+  { id: 4, user: "Amara Osei", avatar: "https://i.pravatar.cc/150?u=amara", action: "created", target: "Onboarding Flows", time: "3h ago" }
+];
 
 export default function Home() {
   const { user, isLoading: authLoading, logout } = useAuth();
@@ -26,20 +32,7 @@ export default function Home() {
   const [generateMeetLink, setGenerateMeetLink] = useState(false);
   
   const [activeTab, setActiveTab] = useState("Dashboard");
-  const [topNavTab, setTopNavTab] = useState("Dashboard");
-
-  // Projects state
-  const [projects, setProjects] = useState<any[]>([]);
-  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
-  const [activeProject, setActiveProject] = useState<any>(null);
-  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
-  const [newProjectName, setNewProjectName] = useState("");
-  const [isCreatingProject, setIsCreatingProject] = useState(false);
-
-  const today = new Date().toDateString();
-  const todayRooms = rooms.filter((r) => !r.project && new Date(r.createdAt).toDateString() === today);
-  const historyRooms = rooms.filter((r) => !r.project && new Date(r.createdAt).toDateString() !== today);
-  const displayRooms = activeTab === "Dashboard" ? todayRooms : historyRooms;
+  const [roomFilter, setRoomFilter] = useState("All");
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -65,28 +58,6 @@ export default function Home() {
     fetchRooms();
   }, [isAuthenticated]);
 
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch("/api/projects", {
-          headers: { "Authorization": `Bearer ${localStorage.getItem("syncspace_token") || ""}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setProjects(data);
-        }
-      } catch (error) {
-        console.error("Error fetching projects", error);
-      } finally {
-        setIsLoadingProjects(false);
-      }
-    };
-    
-    fetchProjects();
-  }, [isAuthenticated]);
-
   const handleCreateRoom = async () => {
     if (!createRoomName.trim()) return;
 
@@ -101,7 +72,7 @@ export default function Home() {
         },
         body: JSON.stringify({ 
           name: createRoomName.trim(),
-          projectId: activeProject ? activeProject._id : null,
+          projectId: null,
           generateMeetLink
         })
       });
@@ -124,326 +95,342 @@ export default function Home() {
     }
   };
 
-  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
-  const [joinRoomId, setJoinRoomId] = useState("");
-  const [isJoining, setIsJoining] = useState(false);
-
-  const handleJoinRoom = async () => {
-    if (!joinRoomId.trim()) return;
-    setIsJoining(true);
-
-    try {
-      const res = await fetch(`/api/rooms/${joinRoomId.trim()}`, {
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("syncspace_token") || ""}`
-        }
-      });
-      
-      const data = await res.json();
-      
-      if (res.ok && data.id) {
-        toast.success("Joined session successfully!");
-        setIsJoinModalOpen(false);
-        setJoinRoomId("");
-        setLocation(`/room/${data.id}`);
-      } else {
-        toast.error(data.error || data.msg || "Session not found or failed to join");
-      }
-    } catch (err) {
-      toast.error("Network error");
-    } finally {
-      setIsJoining(false);
-    }
+  // Assign random types to existing rooms just for visual flair if they don't have one
+  const getRoomVisualData = (room: any, index: number) => {
+    const types = ["Whiteboard", "Code", "Mixed"];
+    const type = types[index % 3];
+    return {
+      type,
+      isLive: index % 4 === 0,
+      avatarCount: (index % 3) + 1
+    };
   };
 
-
-  const handleCreateProject = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newProjectName.trim()) {
-      toast.error("Project name cannot be empty");
-      return;
-    }
-    
-    setIsCreatingProject(true);
-    try {
-      const res = await fetch('/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem("syncspace_token") || ""}`
-        },
-        body: JSON.stringify({ name: newProjectName })
-      });
-      
-      const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.msg || data.error || 'Failed to create project');
-      }
-      
-      toast.success("Project created successfully!");
-      setProjects([data, ...projects]);
-      setIsCreateProjectModalOpen(false);
-      setNewProjectName("");
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setIsCreatingProject(false);
-    }
-  };
+  const filteredRooms = rooms.filter(room => {
+    if (roomFilter === "All") return true;
+    const { type } = getRoomVisualData(room, rooms.indexOf(room));
+    return type === roomFilter;
+  });
 
   if (authLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#050505]">
-        <Spinner className="h-8 w-8 text-blue-500" />
+      <div className="flex h-screen items-center justify-center bg-[#07050a]">
+        <Spinner className="h-8 w-8 text-purple-500" />
       </div>
     );
   }
 
   return (
-    <div className="dark bg-[#050505] min-h-screen text-slate-200 font-['Geist'] flex relative overflow-hidden">
+    <div className="h-screen w-full bg-[#07050a] text-slate-200 font-body flex overflow-hidden">
       
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[40rem] h-[40rem] bg-blue-600/10 rounded-full mix-blend-screen filter blur-[120px] animate-pulse-gentle"></div>
-        <div className="absolute bottom-0 right-1/4 w-[30rem] h-[30rem] bg-indigo-600/10 rounded-full mix-blend-screen filter blur-[120px] animate-pulse-gentle" style={{ animationDelay: '2s' }}></div>
-      </div>
-
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-screen w-[260px] bg-white/[0.02] backdrop-blur-xl border-r border-white/10 flex flex-col py-8 z-50">
-        <div className="px-8 mb-10 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <Code2 className="text-white h-5 w-5" />
+      <aside className="w-[260px] shrink-0 bg-[#0c0a10] border-r border-white/5 flex flex-col z-50">
+        <div className="p-6 flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+            <Layers className="text-white h-4 w-4" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">SyncSpace</h1>
-            <p className="text-xs text-blue-400 font-medium">Enterprise Plan</p>
-          </div>
+          <h1 className="text-xl font-bold text-white tracking-tight">SyncSpace</h1>
         </div>
         
-        <button 
-          onClick={() => setIsCreateModalOpen(true)}
-          disabled={isCreating}
-          className="mx-6 mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 transition-all group cursor-pointer border border-white/10">
-          {isCreating ? (
-            <Spinner className="h-4 w-4 text-white" />
-          ) : (
-            <Plus className="h-5 w-5 opacity-90 group-hover:scale-110 transition-transform" />
-          )}
-          New Session
-        </button>
-        
-        <nav className="flex-1 space-y-1.5 px-3">
-          <a onClick={() => { setActiveTab("Dashboard"); setTopNavTab("Dashboard"); }} className={`flex items-center px-4 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Dashboard" ? "text-white bg-white/10 shadow-sm border border-white/5" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
-            <LayoutDashboard className={`mr-3 h-4 w-4 ${activeTab === "Dashboard" ? "text-blue-400" : ""}`} />
+        <nav className="flex-1 space-y-1 px-4 mt-4">
+          <a onClick={() => setActiveTab("Dashboard")} className={`flex items-center px-3 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Dashboard" ? "text-white bg-purple-500/10 border border-purple-500/20" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <LayoutDashboard className={`mr-3 h-4 w-4 ${activeTab === "Dashboard" ? "text-purple-400" : ""}`} />
             Dashboard
           </a>
-          <a onClick={() => setActiveTab("Workspace")} className={`flex items-center px-4 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Workspace" ? "text-white bg-white/10 shadow-sm border border-white/5" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
-            <Layout className={`mr-3 h-4 w-4 ${activeTab === "Workspace" ? "text-blue-400" : ""}`} />
-            Workspace
+          <a onClick={() => setActiveTab("My Rooms")} className={`flex items-center px-3 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "My Rooms" ? "text-white bg-purple-500/10 border border-purple-500/20" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <Layers className={`mr-3 h-4 w-4 ${activeTab === "My Rooms" ? "text-purple-400" : ""}`} />
+            My Rooms
           </a>
-          <a onClick={() => setActiveTab("History")} className={`flex items-center px-4 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "History" ? "text-white bg-white/10 shadow-sm border border-white/5" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
-            <History className={`mr-3 h-4 w-4 ${activeTab === "History" ? "text-blue-400" : ""}`} />
-            History
-          </a>
-          <a onClick={() => setActiveTab("Team")} className={`flex items-center px-4 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Team" ? "text-white bg-white/10 shadow-sm border border-white/5" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
-            <Users className={`mr-3 h-4 w-4 ${activeTab === "Team" ? "text-blue-400" : ""}`} />
+          <a onClick={() => setActiveTab("Team")} className={`flex items-center px-3 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Team" ? "text-white bg-purple-500/10 border border-purple-500/20" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <Users className={`mr-3 h-4 w-4 ${activeTab === "Team" ? "text-purple-400" : ""}`} />
             Team
+          </a>
+          
+          <div className="pt-4 pb-2 px-3">
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Workspaces</p>
+          </div>
+          
+          <a onClick={() => setActiveTab("Code Spaces")} className={`flex items-center px-3 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Code Spaces" ? "text-white bg-purple-500/10 border border-purple-500/20" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <Code2 className={`mr-3 h-4 w-4 ${activeTab === "Code Spaces" ? "text-purple-400" : ""}`} />
+            Code Spaces
+          </a>
+          <a onClick={() => setActiveTab("Whiteboards")} className={`flex items-center px-3 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Whiteboards" ? "text-white bg-purple-500/10 border border-purple-500/20" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <PenTool className={`mr-3 h-4 w-4 ${activeTab === "Whiteboards" ? "text-purple-400" : ""}`} />
+            Whiteboards
+          </a>
+          <a onClick={() => setActiveTab("Archived")} className={`flex items-center px-3 py-2.5 rounded-lg cursor-pointer text-sm font-medium transition-all ${activeTab === "Archived" ? "text-white bg-purple-500/10 border border-purple-500/20" : "text-slate-400 hover:text-white hover:bg-white/5"}`}>
+            <Archive className={`mr-3 h-4 w-4 ${activeTab === "Archived" ? "text-purple-400" : ""}`} />
+            Archived
           </a>
         </nav>
         
-        <div className="mt-auto px-6">
-          <div className="glass-panel rounded-2xl p-3 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-inner">
-              {user?.username?.charAt(0).toUpperCase() || 'U'}
+        <div className="mt-auto px-4 pb-6">
+          {/* Team Selector */}
+          <div className="mb-4 bg-[#15121c] border border-white/5 rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-[#1a1622] transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded bg-pink-500/20 flex items-center justify-center text-pink-400 font-bold text-sm">N</div>
+              <div>
+                <p className="text-sm font-semibold text-white">Nova Studio</p>
+                <p className="text-xs text-slate-400">12 members</p>
+              </div>
             </div>
-            <div className="overflow-hidden flex-1">
-              <p className="text-sm font-semibold text-white truncate">{user?.username || 'User'}</p>
+            <ChevronsUpDown className="h-4 w-4 text-slate-500" />
+          </div>
+
+          {/* User Profile */}
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white overflow-hidden">
+                <img src={`https://ui-avatars.com/api/?name=${user?.username || 'Mia+Tanaka'}&background=6366f1&color=fff`} alt="Avatar" className="w-full h-full object-cover" />
+              </div>
+              <div className="overflow-hidden flex-1">
+                <p className="text-sm font-semibold text-white truncate">{user?.username || 'Mia Tanaka'}</p>
+                <p className="text-xs text-slate-500 truncate">{user?.email || 'mia@nova.io'}</p>
+              </div>
             </div>
-            <button onClick={() => logout()} className="text-slate-400 hover:text-red-400 transition-colors cursor-pointer p-1.5 rounded-lg hover:bg-red-400/10" title="Logout">
-              <LogOut className="h-4 w-4" />
-            </button>
+            <div className="flex gap-1">
+              <button className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5">
+                <Settings className="h-4 w-4" />
+              </button>
+              <button onClick={() => logout()} className="text-slate-400 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-400/10" title="Logout">
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="ml-[260px] flex flex-col flex-1 min-h-screen relative z-10">
+      <main className="flex-1 flex flex-col h-full overflow-y-auto relative z-10 bg-[#07050a]">
         
-        <header className="h-16 px-8 flex justify-between items-center bg-white/[0.01] backdrop-blur-md border-b border-white/10 sticky top-0 z-40">
-          <div className="flex items-center gap-8">
-            <nav className="flex gap-6">
-              <a className={`text-sm font-medium cursor-pointer transition-all ${topNavTab === "Projects" ? "text-white text-glow" : "text-slate-400 hover:text-white"}`} onClick={() => { setTopNavTab("Projects"); setActiveProject(null); setActiveTab("Workspace"); }}>Projects</a>
-              <a className="text-sm font-medium text-slate-400 hover:text-white transition-all cursor-pointer" onClick={() => toast.info('Shared sessions coming soon')}>Shared</a>
-            </nav>
+        {/* Header */}
+        <header className="h-20 shrink-0 px-10 flex justify-between items-center bg-[#07050a]/80 backdrop-blur-md sticky top-0 z-40">
+          <div>
+            <h2 className="text-2xl font-headings font-bold text-white tracking-tight">Dashboard</h2>
+            <p className="text-sm text-slate-400 mt-1">Good morning, {user?.username?.split(' ')[0] || 'Mia'} 👋</p>
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setIsCreateModalOpen(true)} disabled={isCreating} className="text-sm font-medium px-4 py-1.5 glass-button text-white rounded-lg cursor-pointer flex items-center gap-2 border border-white/10">
-              <Plus className="h-4 w-4 text-blue-400" />
-              Go Live
+
+          <div className="flex items-center gap-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <input 
+                type="text"
+                placeholder="Search rooms..."
+                className="bg-[#120f18] border border-white/5 rounded-lg pl-9 pr-12 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 w-64"
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/5 rounded px-1.5 py-0.5 text-[10px] text-slate-400 font-medium font-mono">
+                ⌘K
+              </div>
+            </div>
+            
+            <button className="relative p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 transition-colors">
+              <Bell className="h-4 w-4 text-slate-300" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-pink-500 rounded-full border border-[#07050a]"></span>
+            </button>
+            
+            <button 
+              onClick={() => setIsCreateModalOpen(true)} 
+              className="text-sm font-semibold px-4 py-2 rounded-lg text-white flex items-center gap-2 hover:scale-105 transition-transform cursor-pointer"
+              style={{ background: 'linear-gradient(90deg, #a855f7 0%, #ec4899 100%)', boxShadow: '0 4px 14px 0 rgba(168, 85, 247, 0.39)' }}
+            >
+              <Plus className="h-4 w-4" />
+              New Room
             </button>
           </div>
         </header>
 
-        <section className="p-8 md:p-12 flex-1 max-w-[1400px] mx-auto w-full overflow-y-auto">
-          {topNavTab === "Projects" ? (
-            <>
-              {activeProject ? (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="flex items-center gap-3 mb-8 text-slate-400">
-                    <button className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer" onClick={() => setActiveProject(null)}>
-                      <ArrowLeft className="h-5 w-5" />
-                    </button>
-                    <span className="text-sm font-medium cursor-pointer hover:text-white transition-colors" onClick={() => setActiveProject(null)}>Projects</span>
-                    <ChevronRight className="h-4 w-4" />
-                    <h2 className="text-2xl font-bold text-white tracking-tight">{activeProject.name}</h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <div onClick={() => setIsCreateModalOpen(true)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer items-center justify-center text-center group border-dashed border-white/20">
-                      <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-blue-500/20 flex items-center justify-center mb-4 transition-all duration-300 shadow-inner border border-white/5">
-                         <Plus className="h-6 w-6 text-slate-400 group-hover:text-blue-400 transition-colors" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">New Session</h3>
-                    </div>
-                    {rooms.filter((r) => r.project === activeProject._id).map((room: any) => (
-                      <div key={room._id} onClick={() => setLocation(`/room/${room.roomId}`)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer group">
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20">
-                          <Code2 className="h-5 w-5 text-blue-400" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-300 transition-colors">{room.name}</h3>
-                        <p className="text-xs text-slate-400 mt-auto flex items-center gap-1">
-                           <History className="h-3 w-3" /> Updated recently
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="flex justify-between items-end mb-8">
-                    <h2 className="text-3xl font-bold text-white tracking-tight">Your Projects</h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <div onClick={() => setIsCreateProjectModalOpen(true)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[180px] cursor-pointer items-center justify-center text-center group border-dashed border-white/20">
-                      <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center mb-3 transition-all duration-300 shadow-inner border border-white/5">
-                        <FolderPlus className="h-6 w-6 text-slate-400 group-hover:text-indigo-400 transition-colors" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">Create Project</h3>
-                    </div>
-                    {projects.map((project: any) => (
-                      <div key={project._id} onClick={() => setActiveProject(project)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[180px] cursor-pointer group">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-4 border border-indigo-500/20">
-                          <FolderKanban className="h-5 w-5 text-indigo-400" />
-                        </div>
-                        <h3 className="text-xl font-semibold text-white mb-1 group-hover:text-indigo-300 transition-colors">{project.name}</h3>
-                        <p className="text-xs text-slate-400 mt-auto">{rooms.filter((r) => r.project === project._id).length} sessions</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h2 className="text-3xl font-bold text-white tracking-tight mb-8">
-                {activeTab === "Dashboard" ? "Recent Sessions" : `${activeTab} Sessions`}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {activeTab === "Dashboard" && (
-                  <>
-                    <div onClick={() => setIsCreateModalOpen(true)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer items-center justify-center text-center group border-dashed border-white/20">
-                      <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-blue-500/20 flex items-center justify-center mb-4 transition-all duration-300 shadow-inner border border-white/5">
-                        <Plus className="h-6 w-6 text-slate-400 group-hover:text-blue-400 transition-colors" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">New Session</h3>
-                    </div>
-                    <div onClick={() => setIsJoinModalOpen(true)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer items-center justify-center text-center group border-dashed border-white/20">
-                      <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-purple-500/20 flex items-center justify-center mb-4 transition-all duration-300 shadow-inner border border-white/5">
-                        <LogIn className="h-6 w-6 text-slate-400 group-hover:text-purple-400 transition-colors" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">Join Session</h3>
-                    </div>
-                  </>
-                )}
-                {displayRooms.map((room: any) => (
-                  <div key={room._id} onClick={() => setLocation(`/room/${room.roomId}`)} className="glass-card rounded-2xl p-6 flex flex-col min-h-[220px] cursor-pointer group">
-                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20">
-                      <Code2 className="h-5 w-5 text-blue-400" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-300 transition-colors">{room.name}</h3>
-                    <p className="text-xs text-slate-400 mt-auto flex items-center gap-1">
-                      <History className="h-3 w-3" /> {new Date(room.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                ))}
+        <section className="p-10 flex-1 max-w-[1600px] w-full mx-auto space-y-10 pb-20">
+          
+          {/* Stats Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div className="bg-[#0f0c16] border border-white/5 rounded-2xl p-6 flex items-center gap-5 hover:border-white/10 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+                <Layers className="h-5 w-5 text-purple-400" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">{rooms.length > 0 ? rooms.length : 14}</h3>
+                <p className="text-xs text-slate-400">Total Rooms</p>
               </div>
             </div>
-          )}
+            <div className="bg-[#0f0c16] border border-white/5 rounded-2xl p-6 flex items-center gap-5 hover:border-white/10 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center border border-pink-500/20">
+                <Users className="h-5 w-5 text-pink-400" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">12</h3>
+                <p className="text-xs text-slate-400">Team Members</p>
+              </div>
+            </div>
+            <div className="bg-[#0f0c16] border border-white/5 rounded-2xl p-6 flex items-center gap-5 hover:border-white/10 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+                <Activity className="h-5 w-5 text-cyan-400" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">3</h3>
+                <p className="text-xs text-slate-400">Active Now</p>
+              </div>
+            </div>
+            <div className="bg-[#0f0c16] border border-white/5 rounded-2xl p-6 flex items-center gap-5 hover:border-white/10 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                <Clock className="h-5 w-5 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white">48h</h3>
+                <p className="text-xs text-slate-400">Hours This Week</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Create Room Banner */}
+          <div className="rounded-3xl p-8 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6" style={{ background: 'linear-gradient(90deg, rgba(30,15,45,1) 0%, rgba(45,15,35,1) 100%)', border: '1px solid rgba(168,85,247,0.15)' }}>
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+            
+            <div className="flex items-center gap-5 relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <Plus className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Create a new room</h3>
+                <p className="text-sm text-slate-300">Start with a blank whiteboard, a code editor, or a mixed workspace. Invite your team in seconds.</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 relative z-10">
+              <button onClick={() => setIsCreateModalOpen(true)} className="cursor-pointer px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold text-white flex items-center gap-2 hover:bg-white/10 transition-colors">
+                <PenTool className="h-4 w-4 text-slate-400" />
+                Whiteboard
+              </button>
+              <button onClick={() => setIsCreateModalOpen(true)} className="cursor-pointer px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold text-white flex items-center gap-2 hover:bg-white/10 transition-colors">
+                <Code2 className="h-4 w-4 text-slate-400" />
+                Code Space
+              </button>
+              <button onClick={() => setIsCreateModalOpen(true)} className="cursor-pointer px-4 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2 hover:opacity-90 transition-opacity" style={{ background: 'linear-gradient(90deg, #a855f7 0%, #ec4899 100%)' }}>
+                <Layers className="h-4 w-4" />
+                Mixed Room
+              </button>
+            </div>
+          </div>
+
+          {/* Recent Rooms */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">Recent Rooms</h3>
+              <div className="flex items-center gap-3">
+                <div className="flex bg-[#120f18] p-1 rounded-lg border border-white/5">
+                  {["All", "Whiteboard", "Code", "Mixed"].map(f => (
+                    <button 
+                      key={f}
+                      onClick={() => setRoomFilter(f)}
+                      className={`cursor-pointer px-4 py-1.5 rounded-md text-xs font-semibold transition-colors ${roomFilter === f ? 'bg-purple-500/20 text-purple-300' : 'text-slate-400 hover:text-white'}`}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+                <button className="text-xs text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-1 cursor-pointer">
+                  View all <ChevronRight className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+
+            {isLoadingRooms ? (
+              <div className="flex justify-center py-12"><Spinner className="text-purple-500 h-8 w-8" /></div>
+            ) : filteredRooms.length === 0 ? (
+              <div className="text-center py-12 text-slate-500 border border-dashed border-white/10 rounded-2xl bg-[#0f0c16]">No rooms found in this category.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {filteredRooms.map((room, idx) => {
+                  const visual = getRoomVisualData(room, idx);
+                  return (
+                    <div 
+                      key={room._id || idx} 
+                      onClick={() => setLocation(`/room/${room.roomId}`)} 
+                      className="bg-[#120f1a] border border-white/5 rounded-2xl overflow-hidden cursor-pointer group hover:border-purple-500/30 transition-all hover:-translate-y-1 shadow-lg shadow-black/50"
+                    >
+                      <div className="h-32 bg-[#1a1625] relative flex items-center justify-center">
+                        {visual.isLive && (
+                          <div className="absolute top-3 right-3 bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            Live
+                          </div>
+                        )}
+                        {visual.type === "Whiteboard" && <PenTool className="h-10 w-10 text-purple-400/50 group-hover:scale-110 transition-transform" />}
+                        {visual.type === "Code" && <Code2 className="h-10 w-10 text-cyan-400/50 group-hover:scale-110 transition-transform" />}
+                        {visual.type === "Mixed" && <Layers className="h-10 w-10 text-pink-400/50 group-hover:scale-110 transition-transform" />}
+                      </div>
+                      <div className="p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <h4 className="font-bold text-white text-sm truncate pr-2 group-hover:text-purple-300 transition-colors">{room.name}</h4>
+                          <button className="text-slate-500 hover:text-white bg-white/5 rounded p-1">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-1 mb-4 text-[10px] font-semibold">
+                          {visual.type === "Whiteboard" && <PenTool className="h-3 w-3 text-purple-400" />}
+                          {visual.type === "Code" && <Code2 className="h-3 w-3 text-cyan-400" />}
+                          {visual.type === "Mixed" && <Layers className="h-3 w-3 text-pink-400" />}
+                          <span className={visual.type === "Whiteboard" ? "text-purple-400" : visual.type === "Code" ? "text-cyan-400" : "text-pink-400"}>
+                            {visual.type === "Code" ? "Code Editor" : visual.type}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center mt-auto">
+                          <div className="flex -space-x-2">
+                            {Array.from({length: visual.avatarCount }).map((_, i) => (
+                              <img key={i} src={`https://i.pravatar.cc/150?img=${(idx * 3 + i) % 70}`} className="w-6 h-6 rounded-full border-2 border-[#120f1a] relative z-10" alt="Avatar" />
+                            ))}
+                            {visual.avatarCount > 1 && (
+                              <div className="w-6 h-6 rounded-full border-2 border-[#120f1a] bg-[#2a2438] flex items-center justify-center text-[8px] text-white relative z-0">
+                                +1
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-slate-500 font-medium">
+                            {visual.isLive ? 'Just now' : '2 hours ago'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Team Activity */}
+          <div>
+            <h3 className="text-xl font-bold text-white mb-6">Team Activity</h3>
+            <div className="bg-[#0f0c16] border border-white/5 rounded-2xl overflow-hidden">
+              {TEAM_ACTIVITY.map((activity, index) => (
+                <div key={activity.id} className={`flex items-center justify-between p-4 px-6 hover:bg-white/[0.02] transition-colors ${index !== TEAM_ACTIVITY.length - 1 ? 'border-b border-white/5' : ''}`}>
+                  <div className="flex items-center gap-4">
+                    <img src={activity.avatar} className="w-8 h-8 rounded-full" alt={activity.user} />
+                    <p className="text-sm">
+                      <span className="font-bold text-white">{activity.user}</span>{' '}
+                      <span className="text-slate-400">{activity.action}</span>{' '}
+                      <span className="font-semibold text-purple-400">{activity.target}</span>
+                    </p>
+                  </div>
+                  <span className="text-xs text-slate-500 font-medium">{activity.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
         </section>
       </main>
 
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="glass-panel border-white/10 text-white sm:max-w-md">
-          <DialogTitle className="text-xl font-bold tracking-tight">Create New Session</DialogTitle>
-          <div className="py-4 space-y-4">
-            <Input 
-              value={createRoomName} 
-              onChange={(e) => setCreateRoomName(e.target.value)} 
-              placeholder="Session Name" 
-              className="bg-black/20 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 h-11"
-              autoFocus
-            />
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="generate-meet" 
-                checked={generateMeetLink}
-                onCheckedChange={(checked) => setGenerateMeetLink(checked as boolean)}
-              />
-              <Label htmlFor="generate-meet" className="text-sm font-medium text-slate-300 cursor-pointer">
-                Generate Video Meeting Link (Jitsi Meet)
-              </Label>
-            </div>
-          </div>
-          <Button onClick={handleCreateRoom} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg h-11 border-0">
-            Create
-          </Button>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isJoinModalOpen} onOpenChange={setIsJoinModalOpen}>
-        <DialogContent className="glass-panel border-white/10 text-white sm:max-w-md">
-          <DialogTitle className="text-xl font-bold tracking-tight">Join Existing Session</DialogTitle>
-          <div className="py-4">
-            <Input 
-              value={joinRoomId} 
-              onChange={(e) => setJoinRoomId(e.target.value)} 
-              placeholder="Session ID" 
-              className="bg-black/20 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 h-11"
-              autoFocus
-            />
-          </div>
-          <Button onClick={handleJoinRoom} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg h-11 border-0">
-            Join
-          </Button>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isCreateProjectModalOpen} onOpenChange={setIsCreateProjectModalOpen}>
-        <DialogContent className="glass-panel border-white/10 text-white sm:max-w-md">
-          <DialogTitle className="text-xl font-bold tracking-tight">Create Project</DialogTitle>
-          <form onSubmit={handleCreateProject} className="grid gap-4 py-4">
-            <Input 
-              value={newProjectName} 
-              onChange={(e) => setNewProjectName(e.target.value)} 
-              placeholder="Project Name" 
-              className="bg-black/20 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-blue-500/20 h-11"
-              autoFocus 
-            />
-            <Button type="submit" disabled={isCreatingProject} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg h-11 border-0">
-               {isCreatingProject ? <Spinner className="h-4 w-4 mr-2" /> : null}
-               Create Project
-            </Button>
-          </form>
+        <DialogContent className="max-w-4xl p-0 border-0 bg-transparent shadow-none [&>button]:hidden sm:max-w-4xl lg:max-w-5xl">
+          <DialogTitle className="sr-only">Create New Session</DialogTitle>
+          <CreateRoomDialog
+            createRoomName={createRoomName}
+            setCreateRoomName={setCreateRoomName}
+            generateMeetLink={generateMeetLink}
+            setGenerateMeetLink={setGenerateMeetLink}
+            handleCreateRoom={handleCreateRoom}
+            onClose={() => setIsCreateModalOpen(false)}
+            isCreating={isCreating}
+          />
         </DialogContent>
       </Dialog>
     </div>

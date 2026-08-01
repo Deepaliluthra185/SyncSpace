@@ -170,6 +170,7 @@ export default defineConfig({
   },
   server: {
     host: true,
+    port: 5174,
     allowedHosts: [
       ".manuspre.computer",
       ".manus.computer",
@@ -185,16 +186,16 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         changeOrigin: true,
       },
       '/socket.io': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         ws: true,
         changeOrigin: true,
       },
       '^/room-.*': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
         ws: true,
         changeOrigin: true,
       }

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "banani": {
+      "transport": "sse",
+      "url": "https://app.banani.co/api/mcp/mcp",
+      "headers": {
+        "Authorization": "Bearer bnni_A5b3cLJVdVH1PbsWQ4GAEZEzyhim1x5M"
+      }
+    }
+  }
+}
