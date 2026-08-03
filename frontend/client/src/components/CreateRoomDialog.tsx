@@ -1,5 +1,5 @@
-import React from 'react';
-import { Share2, X, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Loader2, PenTool, Code2, Layers, UserPlus } from 'lucide-react';
 
 interface CreateRoomDialogProps {
   createRoomName: string;
@@ -20,100 +20,146 @@ export function CreateRoomDialog({
   onClose,
   isCreating
 }: CreateRoomDialogProps) {
-  return (
-    <div className="w-full flex-1 items-center theme-dialog text-foreground font-sans rounded-xl relative overflow-hidden">
-      {/* Background gradient from user's snippet */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-secondary to-background -z-10"></div>
-      
-      <section className="grid w-full overflow-hidden rounded-xl border border-border bg-card/80 shadow-lg backdrop-blur-xl lg:grid-cols-5 shadow-theme">
-        <aside className="border-b border-border bg-gradient-to-br from-primary to-tertiary p-8 lg:col-span-2 lg:border-b-0 lg:border-r">
-          <div className="flex h-full flex-col justify-between">
-            <div>
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-card/20 text-primary-foreground">
-                <Share2 className="text-2xl" />
-              </span>
-              <p className="mt-8 text-xs font-semibold uppercase tracking-widest text-primary-foreground">
-                Live workspace
-              </p>
-              <h1 className="mt-3 font-heading text-2xl font-bold text-primary-foreground leading-tight">
-                Bring the right people into the room.
-              </h1>
-              <p className="mt-4 text-sm leading-6 text-primary-foreground/90">
-                Your teammates can co-create in real time—without losing the context behind every decision.
-              </p>
-            </div>
-            <div className="mt-10 flex items-center gap-2">
-              <img src="https://randomuser.me/api/portraits/women/44.jpg" className="h-9 w-9 rounded-full border-2 border-primary" alt="Maya" />
-              <img src="https://randomuser.me/api/portraits/men/32.jpg" className="h-9 w-9 rounded-full border-2 border-primary" alt="Theo" />
-              <img src="https://randomuser.me/api/portraits/women/65.jpg" className="h-9 w-9 rounded-full border-2 border-primary" alt="Sofia" />
-              <span className="ml-2 text-xs font-medium text-primary-foreground">
-                8 collaborators online
-              </span>
-            </div>
-          </div>
-        </aside>
-        
-        <div className="p-8 lg:col-span-3 relative">
-          <button 
-            onClick={onClose} 
-            className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-accent hover:text-foreground"
-          >
-            <X className="text-lg" />
-          </button>
-          
-          <div className="flex items-start justify-between gap-4 mt-2">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-tertiary">New Session</p>
-              <h2 className="mt-2 font-heading text-lg font-semibold">Create a Workspace</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Start a new whiteboard and code editor session.</p>
-            </div>
-            <span className="rounded-full bg-tertiary/20 px-3 py-1 text-xs font-bold text-tertiary border border-tertiary/30">
-              Live now
-            </span>
-          </div>
+  const [roomType, setRoomType] = useState('Whiteboard');
 
-          <label className="mt-7 block text-sm font-medium text-foreground">Session Name</label>
-          <div className="mt-2 flex flex-col gap-3">
+  return (
+    <div className="w-full max-w-[460px] mx-auto flex-1 items-center font-sans rounded-[20px] relative overflow-hidden bg-[#110e17] border border-white/5 shadow-2xl">
+      <div className="p-8">
+        <button 
+          onClick={onClose} 
+          className="absolute top-6 right-6 flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 text-slate-400 transition hover:bg-white/10 hover:text-white"
+        >
+          <X className="w-4 h-4" />
+        </button>
+        
+        <div>
+          <h2 className="text-[22px] font-bold text-white tracking-tight">Create a new room</h2>
+          <p className="mt-1.5 text-sm text-[#7e85a0]">Choose a type and give it a name</p>
+        </div>
+
+        <div className="mt-8">
+          <label className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">Room Type</label>
+          <div className="mt-3 flex flex-col gap-3">
+            {/* Whiteboard Option */}
+            <div 
+              onClick={() => setRoomType('Whiteboard')}
+              className={`flex items-center justify-between p-4 rounded-[14px] border cursor-pointer transition-all ${
+                roomType === 'Whiteboard' 
+                  ? 'border-purple-500 bg-purple-500/5' 
+                  : 'border-white/5 bg-[#15121c] hover:border-white/10'
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-[#1e152e] flex items-center justify-center">
+                  <PenTool className="w-4 h-4 text-purple-400" />
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-bold text-white mb-0.5">Whiteboard</h4>
+                  <p className="text-[11px] text-[#7e85a0]">Visual diagrams, wireframes, and brainstorming</p>
+                </div>
+              </div>
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                roomType === 'Whiteboard' ? 'border-purple-400' : 'border-slate-600'
+              }`}>
+                {roomType === 'Whiteboard' && <div className="w-2 h-2 bg-purple-400 rounded-full"></div>}
+              </div>
+            </div>
+
+            {/* Code Space Option */}
+            <div 
+              onClick={() => setRoomType('Code Space')}
+              className={`flex items-center justify-between p-4 rounded-[14px] border cursor-pointer transition-all ${
+                roomType === 'Code Space' 
+                  ? 'border-purple-500 bg-purple-500/5' 
+                  : 'border-white/5 bg-[#15121c] hover:border-white/10'
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-[#101b2a] flex items-center justify-center">
+                  <Code2 className="w-4 h-4 text-cyan-400" />
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-bold text-white mb-0.5">Code Space</h4>
+                  <p className="text-[11px] text-[#7e85a0]">Collaborative code editing with live sync</p>
+                </div>
+              </div>
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                roomType === 'Code Space' ? 'border-purple-400' : 'border-slate-600'
+              }`}>
+                {roomType === 'Code Space' && <div className="w-2 h-2 bg-purple-400 rounded-full"></div>}
+              </div>
+            </div>
+
+            {/* Mixed Room Option */}
+            <div 
+              onClick={() => setRoomType('Mixed Room')}
+              className={`flex items-center justify-between p-4 rounded-[14px] border cursor-pointer transition-all ${
+                roomType === 'Mixed Room' 
+                  ? 'border-purple-500 bg-purple-500/5' 
+                  : 'border-white/5 bg-[#15121c] hover:border-white/10'
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-[#2a1711] flex items-center justify-center">
+                  <Layers className="w-4 h-4 text-orange-400" />
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-bold text-white mb-0.5">Mixed Room</h4>
+                  <p className="text-[11px] text-[#7e85a0]">Combine a whiteboard and code editor in one room</p>
+                </div>
+              </div>
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                roomType === 'Mixed Room' ? 'border-purple-400' : 'border-slate-600'
+              }`}>
+                {roomType === 'Mixed Room' && <div className="w-2 h-2 bg-purple-400 rounded-full"></div>}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <label className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">Room Name</label>
+          <div className="mt-2">
             <input 
               type="text" 
-              placeholder="e.g., Q3 Product Map"
-              className="flex flex-1 items-center gap-3 rounded-lg border border-input bg-secondary px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring text-foreground placeholder-muted-foreground"
+              placeholder="e.g. Auth Flow Redesign"
+              className="w-full bg-[#15121c] border border-white/5 rounded-xl px-4 py-3 text-[13px] text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50"
               value={createRoomName}
               onChange={(e) => setCreateRoomName(e.target.value)}
               autoFocus
             />
           </div>
+        </div>
 
-          <div className="mt-6 flex items-center gap-3 bg-secondary/50 p-4 rounded-lg border border-border">
+        <div className="mt-6">
+          <label className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">Invite Team Members (Optional)</label>
+          <div className="mt-2 relative">
             <input 
-              type="checkbox"
-              id="generate-meet"
-              checked={generateMeetLink}
-              onChange={(e) => setGenerateMeetLink(e.target.checked)}
-              className="h-4 w-4 rounded border-input bg-secondary text-primary focus:ring-ring cursor-pointer"
+              type="text" 
+              placeholder="Add by name or email..."
+              className="w-full bg-[#15121c] border border-white/5 rounded-xl pl-4 pr-10 py-3 text-[13px] text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50"
             />
-            <label htmlFor="generate-meet" className="text-sm font-medium text-foreground cursor-pointer flex-1">
-              Generate Video Meeting Link (Jitsi Meet)
-            </label>
-          </div>
-
-          <div className="mt-7 flex justify-end gap-3 border-t border-border pt-6">
-            <button 
-              onClick={onClose} 
-              className="rounded-lg px-4 py-3 text-sm font-semibold text-muted-foreground transition hover:bg-accent hover:text-foreground"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={handleCreateRoom} 
-              disabled={isCreating}
-              className="rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-md transition hover:scale-105 hover:shadow-lg flex items-center justify-center min-w-[130px] disabled:opacity-70 disabled:hover:scale-100"
-            >
-              {isCreating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Room"}
-            </button>
+            <UserPlus className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           </div>
         </div>
-      </section>
+
+        <div className="mt-8 flex gap-4">
+          <button 
+            onClick={onClose} 
+            className="flex-1 rounded-xl bg-[#1a1722] py-3 text-[13px] font-bold text-slate-400 transition hover:bg-white/5 hover:text-white"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={handleCreateRoom} 
+            disabled={isCreating}
+            className="flex-1 rounded-xl py-3 text-[13px] font-bold text-white shadow-lg shadow-purple-500/20 transition hover:opacity-90 disabled:opacity-70 flex items-center justify-center"
+            style={{ background: 'linear-gradient(90deg, #a855f7 0%, #d946ef 100%)' }}
+          >
+            {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Room"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
