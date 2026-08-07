@@ -14,6 +14,12 @@ export default function AuthPage() {
   const { login, token } = useAuth();
 
   useEffect(() => {
+    if (window.location.search.includes('mode=login')) {
+      setIsLogin(true);
+    }
+  }, []);
+
+  useEffect(() => {
     if (token) {
       setLocation("/dashboard");
     }
@@ -96,6 +102,21 @@ export default function AuthPage() {
             <p className="text-slate-400 text-sm mt-3">
               {isLogin ? "Sign in to your account to continue collaborating." : "Create your account and start collaborating in real time."}
             </p>
+          </div>
+
+          <div className="flex bg-white/5 p-1 rounded-xl mb-6">
+            <button 
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${!isLogin ? 'bg-purple-600/50 text-white shadow-lg shadow-purple-900/20' : 'text-slate-400 hover:text-white'}`}
+              onClick={() => { setIsLogin(false); setAgreed(false); }}
+            >
+              Register
+            </button>
+            <button 
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${isLogin ? 'bg-purple-600/50 text-white shadow-lg shadow-purple-900/20' : 'text-slate-400 hover:text-white'}`}
+              onClick={() => { setIsLogin(true); setAgreed(false); }}
+            >
+              Sign In
+            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

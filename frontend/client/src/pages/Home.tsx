@@ -8,10 +8,11 @@ import {
   LayoutDashboard, Users, LogOut, Plus, Search, Bell, 
   Layers, Code2, PenTool, Archive, ChevronsUpDown,
   Activity, Clock, ChevronRight, Settings, Grid, List, Tag, MoreHorizontal, Info,
-  MessageSquare, UserPlus, User, Briefcase, CreditCard, Plug, Shield, Upload
+  MessageSquare, UserPlus, User, Briefcase, CreditCard, Plug, Shield, Upload, LogIn
 } from "lucide-react";
 import { CreateRoomDialog } from "@/components/CreateRoomDialog";
 import { InviteMemberDialog } from "@/components/InviteMemberDialog";
+import { JoinRoomDialog } from "@/components/JoinRoomDialog";
 
 // Placeholder data for Team Activity
 const TEAM_ACTIVITY: any[] = [];
@@ -172,6 +173,7 @@ export default function Home() {
   const [isLoadingRooms, setIsLoadingRooms] = useState(true);
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [createRoomName, setCreateRoomName] = useState("");
   const [generateMeetLink, setGenerateMeetLink] = useState(false);
@@ -376,6 +378,13 @@ export default function Home() {
                 </button>
                 
                 <button 
+                  onClick={() => setIsJoinModalOpen(true)} 
+                  className="text-sm font-semibold px-4 py-2 rounded-lg text-white flex items-center gap-2 hover:bg-white/10 transition-colors border border-white/10 cursor-pointer"
+                >
+                  <LogIn className="h-4 w-4" />
+                  Join Room
+                </button>
+                <button 
                   onClick={() => setIsCreateModalOpen(true)} 
                   className="text-sm font-semibold px-4 py-2 rounded-lg text-white flex items-center gap-2 hover:scale-105 transition-transform cursor-pointer"
                   style={{ background: 'linear-gradient(90deg, #a855f7 0%, #ec4899 100%)', boxShadow: '0 4px 14px 0 rgba(168, 85, 247, 0.39)' }}
@@ -542,6 +551,13 @@ export default function Home() {
                   <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-purple-500 rounded-full border-2 border-[#07050a] flex items-center justify-center text-[8px] font-bold text-white">3</span>
                 </button>
                 
+                <button 
+                  onClick={() => setIsJoinModalOpen(true)} 
+                  className="text-sm font-semibold px-4 py-2.5 rounded-lg text-white flex items-center gap-2 hover:bg-white/10 transition-colors border border-white/10 cursor-pointer"
+                >
+                  <LogIn className="h-4 w-4" />
+                  Join Room
+                </button>
                 <button 
                   onClick={() => setIsCreateModalOpen(true)} 
                   className="text-sm font-semibold px-4 py-2.5 rounded-lg text-white flex items-center gap-2 hover:scale-105 transition-transform cursor-pointer shadow-lg shadow-purple-500/20"
@@ -1363,6 +1379,11 @@ export default function Home() {
       <InviteMemberDialog 
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
+      />
+
+      <JoinRoomDialog
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
       />
     </div>
   );

@@ -91,7 +91,7 @@ export function SyncSpaceWhiteboard() {
     const doc = new Y.Doc();
     ydocRef.current = doc;
 
-    const wsUrl = window.location.hostname === 'localhost' ? 'ws://localhost:5000' : `wss://${window.location.host}`;
+    const wsUrl = window.location.hostname === 'localhost' ? 'ws://localhost:5001' : `wss://${window.location.host}`;
     
     const provider = new WebsocketProvider(wsUrl, roomId, doc);
     providerRef.current = provider;

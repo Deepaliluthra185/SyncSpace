@@ -35,7 +35,7 @@ export function useYjsCodeEditor({
 
     // Initialize WebSocket provider for Yjs
     const defaultWsUrl = window.location.hostname === 'localhost' 
-      ? 'ws://localhost:5000' 
+      ? 'ws://localhost:5001' 
       : `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}`;
     const wsUrl = import.meta.env.VITE_WS_URL || defaultWsUrl;
 

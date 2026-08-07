@@ -38,7 +38,7 @@ export default function NavBar() {
       </div>
       {/* CTA */}
       <div className="flex items-center gap-3">
-        <a onClick={() => setLocation('/auth')} className="text-sm text-muted-foreground font-body font-medium px-4 py-2 cursor-pointer transition-colors hover:text-foreground">{'Sign in'}</a>
+        <a onClick={() => setLocation('/auth?mode=login')} className="text-sm text-muted-foreground font-body font-medium px-4 py-2 cursor-pointer transition-colors hover:text-foreground">{'Sign in'}</a>
         <button
           onClick={() => setLocation('/auth')}
           className="text-sm font-body font-medium text-primary-foreground px-5 py-2 rounded-md cursor-pointer transition-transform hover:scale-105"
