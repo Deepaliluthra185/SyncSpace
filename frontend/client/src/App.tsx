@@ -1,42 +1,15 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import Room from "./pages/Room";
 import AuthPage from "./pages/AuthPage";
-import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
-
-// Protected Route Wrapper
-const ProtectedRoute = ({ component: Component }: { component: any }) => {
-  const { token, isLoading } = useAuth();
-  const [, setLocation] = useLocation();
-
-  useEffect(() => {
-    if (!isLoading && !token) {
-      setLocation("/auth");
-    }
-  }, [isLoading, token, setLocation]);
-
-  if (isLoading) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-[#050505]">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-      </div>
-    );
-  }
-
-  if (!token) {
-    return null;
-  }
-
-  return <Component />;
-};
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function Router() {
   return (
