@@ -1,13 +1,13 @@
-import { useEffect, ComponentType } from "react";
+import React, { useEffect, ComponentType } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
-  component: ComponentType<any>;
+  component: React.ComponentType<any>;
 }
 
-export const ProtectedRoute = ({ component: Component }: ProtectedRouteProps) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component }) => {
   const { token, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
